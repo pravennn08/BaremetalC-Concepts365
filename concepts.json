@@ -1,0 +1,4396 @@
+{
+  "concepts": [
+    {
+      "date": "2026-09-01",
+      "title": "Memory Layout of a C Program",
+      "core_question": "What lives in text, data, bss, heap, and stack?",
+      "things_to_check": [
+        "Where are global variables stored?",
+        "What happens to uninitialized static variables?",
+        "How does stack frame layout work?",
+        "How to inspect memory segments at runtime?"
+      ],
+      "exercise": "Write a program that prints the addresses of a local variable, a global variable, a static variable, and a dynamically allocated pointer. Map these to their segments."
+    },
+    {
+      "date": "2026-09-02",
+      "title": "Idempotency",
+      "core_question": "Can this operation be safely repeated?",
+      "things_to_check": [
+        "What happens when a request is retried?",
+        "Where should the idempotency key be stored?",
+        "How long should the result be retained?",
+        "Can concurrent duplicate requests race?"
+      ],
+      "exercise": "Design an idempotent POST /payments endpoint with in-memory key storage and proper mutex locking in C."
+    },
+    {
+      "date": "2026-09-03",
+      "title": "Pointer Arithmetic and Array Decay",
+      "core_question": "How do arrays differ from pointers in practice?",
+      "things_to_check": [
+        "When does an array decay to a pointer?",
+        "What is sizeof(array) vs sizeof(pointer)?",
+        "How does pointer arithmetic handle different types?",
+        "What are the pitfalls of multi-dimensional arrays?"
+      ],
+      "exercise": "Implement a function that sums a 2D matrix using both array indexing and pointer arithmetic. Compare assembly output."
+    },
+    {
+      "date": "2026-09-04",
+      "title": "The Volatile Keyword",
+      "core_question": "When should variables be marked volatile?",
+      "things_to_check": [
+        "How does volatile prevent compiler optimizations?",
+        "When is volatile needed for memory-mapped I/O?",
+        "Does volatile make variables atomic?",
+        "Common misconceptions about volatile"
+      ],
+      "exercise": "Write a busy-wait loop that polls a hardware register (simulated with a pointer). Show the difference with and without volatile using compiler explorer."
+    },
+    {
+      "date": "2026-09-05",
+      "title": "Bit Manipulation and Bitfields",
+      "core_question": "How to pack and unpack data efficiently?",
+      "things_to_check": [
+        "What are the bitwise operators and their pitfalls?",
+        "When to use bitfields vs manual bit manipulation?",
+        "How does endianness affect bit packing?",
+        "What are the portability issues with bitfields?"
+      ],
+      "exercise": "Implement a protocol header parser that extracts fields from a 32-bit word using both bitfields and shift/mask operations. Compare the generated assembly."
+    },
+    {
+      "date": "2026-09-06",
+      "title": "The Restrict Keyword",
+      "core_question": "How does restrict enable compiler optimization?",
+      "things_to_check": [
+        "What aliasing assumptions does restrict make?",
+        "When is it safe to use restrict?",
+        "How does restrict interact with pointers to pointers?",
+        "What's the performance impact in practice?"
+      ],
+      "exercise": "Implement a vector addition function with and without restrict. Compare performance for large arrays."
+    },
+    {
+      "date": "2026-09-07",
+      "title": "Function Pointers and Callbacks",
+      "core_question": "How to implement flexible, runtime-dynamic behavior?",
+      "things_to_check": [
+        "What's the syntax for declaring function pointers?",
+        "How to create arrays of function pointers?",
+        "What are the security implications of function pointers?",
+        "How to pass context to callbacks?"
+      ],
+      "exercise": "Implement a generic sorting function that accepts a comparison function pointer. Sort an array of structs by different fields."
+    },
+    {
+      "date": "2026-09-08",
+      "title": "Static and Dynamic Linking",
+      "core_question": "What happens between compilation and execution?",
+      "things_to_check": [
+        "How do static libraries differ from shared libraries?",
+        "What is the role of the dynamic linker?",
+        "How to handle symbol resolution conflicts?",
+        "How to create and use a shared library in C?"
+      ],
+      "exercise": "Create a static library and a shared library from the same source. Build executables linking each and compare their sizes and behavior."
+    },
+    {
+      "date": "2026-09-09",
+      "title": "Signal Handling",
+      "core_question": "How to handle asynchronous events gracefully?",
+      "things_to_check": [
+        "Which signals can be caught and which cannot?",
+        "What functions are async-signal-safe?",
+        "How to avoid race conditions in signal handlers?",
+        "What is the difference between signal and sigaction?"
+      ],
+      "exercise": "Write a program that catches SIGINT, prints a message, and continues. Then add a SIGALRM handler that sets a flag polled in the main loop."
+    },
+    {
+      "date": "2026-09-10",
+      "title": "File Descriptors and I/O",
+      "core_question": "How does the kernel manage open files?",
+      "things_to_check": [
+        "What's the difference between buffered and unbuffered I/O?",
+        "How do dup, dup2, and fcntl work?",
+        "What are the file descriptor flags?",
+        "How to implement non-blocking I/O?"
+      ],
+      "exercise": "Implement a simple program that reads from stdin, writes to stdout, and handles redirection. Then add a custom file copy function using read/write with various buffer sizes."
+    },
+    {
+      "date": "2026-09-11",
+      "title": "Process Creation and Fork",
+      "core_question": "What exactly happens when fork is called?",
+      "things_to_check": [
+        "What is copy-on-write and why does it matter?",
+        "How to avoid zombie processes?",
+        "What is the difference between fork, vfork, and clone?",
+        "How to share file descriptors between processes?"
+      ],
+      "exercise": "Write a program that forks a child process. The parent waits for the child, which executes a different code path. Add pipes for inter-process communication."
+    },
+    {
+      "date": "2026-09-12",
+      "title": "Pipes and FIFOs",
+      "core_question": "How to communicate between related and unrelated processes?",
+      "things_to_check": [
+        "What are the differences between anonymous pipes and named pipes?",
+        "How to handle blocking vs non-blocking reads/writes?",
+        "What happens when a pipe is closed?",
+        "How to multiplex multiple pipes?"
+      ],
+      "exercise": "Implement a simple shell pipeline: cmd1 | cmd2 | cmd3. Use fork, dup2, and pipe to connect stdin/stdout between processes."
+    },
+    {
+      "date": "2026-09-13",
+      "title": "Shared Memory",
+      "core_question": "How to share memory between processes efficiently?",
+      "things_to_check": [
+        "What are POSIX shared memory vs System V?",
+        "How to synchronize access to shared memory?",
+        "What happens to shared memory when processes exit?",
+        "How to map files into memory with mmap?"
+      ],
+      "exercise": "Implement a producer-consumer pattern using POSIX shared memory with a mutex and condition variable stored in the shared segment."
+    },
+    {
+      "date": "2026-09-14",
+      "title": "Message Queues",
+      "core_question": "How to send structured messages between processes?",
+      "things_to_check": [
+        "What are the advantages over pipes?",
+        "How to handle message priorities?",
+        "What are the capacity limits?",
+        "How to choose between System V and POSIX message queues?"
+      ],
+      "exercise": "Create a simple chat program where multiple clients send messages to a server using POSIX message queues with message priorities."
+    },
+    {
+      "date": "2026-09-15",
+      "title": "Threads and Pthreads",
+      "core_question": "What's the difference between processes and threads?",
+      "things_to_check": [
+        "How to create and join threads?",
+        "What thread attributes are configurable?",
+        "How to pass data to threads safely?",
+        "What are the stack size considerations?"
+      ],
+      "exercise": "Write a multi-threaded program that calculates the sum of an array using multiple threads. Each thread processes a chunk of the array. Compare performance with process-based version."
+    },
+    {
+      "date": "2026-09-16",
+      "title": "Mutexes and Condition Variables",
+      "core_question": "How to synchronize thread access to shared resources?",
+      "things_to_check": [
+        "What is the difference between mutex and spinlock?",
+        "How to avoid deadlock?",
+        "What is the condition variable pattern?",
+        "What are the pthread mutex attributes?"
+      ],
+      "exercise": "Implement a thread-safe queue with mutexes and condition variables. Include proper handling of spurious wakeups."
+    },
+    {
+      "date": "2026-09-17",
+      "title": "Atomic Operations",
+      "core_question": "When are atomic operations necessary and sufficient?",
+      "things_to_check": [
+        "What operations can be made atomic in C?",
+        "How to use C11 atomics?",
+        "What are memory barriers and when are they needed?",
+        "What is the difference between atomic and volatile?"
+      ],
+      "exercise": "Implement a lock-free counter using C11 atomic operations. Compare with a mutex-protected counter in a multi-threaded benchmark."
+    },
+    {
+      "date": "2026-09-18",
+      "title": "Thread-Specific Storage",
+      "core_question": "How to maintain per-thread state?",
+      "things_to_check": [
+        "How to use pthread_key_t and pthread_setspecific?",
+        "What happens to thread-local data on thread exit?",
+        "When to use __thread or thread_local?",
+        "How to cleanup thread-local storage?"
+      ],
+      "exercise": "Create a thread-safe logging system where each thread maintains its own log buffer using thread-specific storage, flushing on completion."
+    },
+    {
+      "date": "2026-09-19",
+      "title": "Non-Blocking I/O and Select",
+      "core_question": "How to monitor multiple file descriptors?",
+      "things_to_check": [
+        "How to set non-blocking mode on file descriptors?",
+        "What are the limitations of select?",
+        "How to handle EAGAIN and EWOULDBLOCK?",
+        "What is the difference between select, poll, and epoll?"
+      ],
+      "exercise": "Implement a simple TCP server that handles multiple clients using select. Handle read/write events without blocking."
+    },
+    {
+      "date": "2026-09-20",
+      "title": "Epoll and Event-Driven Programming",
+      "core_question": "How to handle thousands of connections efficiently?",
+      "things_to_check": [
+        "What are edge-triggered vs level-triggered events?",
+        "How to use epoll_create, epoll_ctl, and epoll_wait?",
+        "How to manage connection state in event loops?",
+        "What are the performance advantages of epoll?"
+      ],
+      "exercise": "Write an echo server using epoll that handles many concurrent connections. Include proper handling of partial reads/writes."
+    },
+    {
+      "date": "2026-09-21",
+      "title": "TCP Socket Programming",
+      "core_question": "How to establish reliable network connections?",
+      "things_to_check": [
+        "What is the TCP three-way handshake?",
+        "How to handle connection establishment failures?",
+        "What are socket options and when to use them?",
+        "How to handle TCP_NODELAY and Nagle's algorithm?"
+      ],
+      "exercise": "Implement a TCP client-server application where the server echoes back a message. Handle connection resets, timeouts, and partial sends gracefully."
+    },
+    {
+      "date": "2026-09-22",
+      "title": "UDP and Datagram Sockets",
+      "core_question": "How to handle connectionless, unreliable communication?",
+      "things_to_check": [
+        "What are the differences between TCP and UDP?",
+        "How to handle packet loss and reordering?",
+        "How to implement reliability on top of UDP?",
+        "When is UDP preferred over TCP?"
+      ],
+      "exercise": "Implement a UDP-based file transfer protocol with retransmission and acknowledgments. Handle packet loss simulation."
+    },
+    {
+      "date": "2026-09-23",
+      "title": "Unix Domain Sockets",
+      "core_question": "How to communicate between processes on the same host?",
+      "things_to_check": [
+        "What are the performance advantages?",
+        "How to pass file descriptors over Unix sockets?",
+        "What are the security implications?",
+        "How to use SOCK_SEQPACKET?"
+      ],
+      "exercise": "Implement a privileged daemon that receives file descriptors over Unix domain sockets from unprivileged clients and performs operations on them."
+    },
+    {
+      "date": "2026-09-24",
+      "title": "Timer Management",
+      "core_question": "How to implement timeouts and periodic tasks?",
+      "things_to_check": [
+        "How to use timerfd_create?",
+        "What are the differences between settimer and timer_create?",
+        "How to implement a timing wheel?",
+        "How to handle system time changes?"
+      ],
+      "exercise": "Implement a connection timeout system for a network server using a timer wheel. Each connection times out after N seconds of inactivity."
+    },
+    {
+      "date": "2026-09-25",
+      "title": "Memory Pool Allocation",
+      "core_question": "How to manage memory efficiently for high-performance applications?",
+      "things_to_check": [
+        "What are the advantages over malloc/free?",
+        "How to implement a slab allocator?",
+        "How to handle variable-size allocations?",
+        "How to avoid fragmentation?"
+      ],
+      "exercise": "Implement a fixed-size memory pool that allocates and frees blocks efficiently. Include thread-safety and demonstrate reuse patterns."
+    },
+    {
+      "date": "2026-09-26",
+      "title": "Cache and Alignment",
+      "core_question": "How does memory layout affect performance?",
+      "things_to_check": [
+        "What is cache line size and why does it matter?",
+        "How to align structures for cache efficiency?",
+        "What is false sharing and how to avoid it?",
+        "How to use __attribute__((aligned))?"
+      ],
+      "exercise": "Write a benchmark that compares performance of an array of structs where fields are ordered for cache efficiency vs poorly ordered. Measure cache misses."
+    },
+    {
+      "date": "2026-09-27",
+      "title": "Endianness and Serialization",
+      "core_question": "How to exchange data between systems with different architectures?",
+      "things_to_check": [
+        "How to detect endianness at runtime?",
+        "What are network byte order functions?",
+        "How to design a portable serialization format?",
+        "How to handle floating-point serialization?"
+      ],
+      "exercise": "Implement a serializer that converts a struct containing integers, floats, and strings to a byte stream and back, handling endianness conversion."
+    },
+    {
+      "date": "2026-09-28",
+      "title": "Error Handling Patterns",
+      "core_question": "How to design robust error handling?",
+      "things_to_check": [
+        "What are the tradeoffs of return codes vs errno?",
+        "How to use setjmp/longjmp for exception-like handling?",
+        "How to propagate errors up the call stack?",
+        "How to handle cleanup on error paths?"
+      ],
+      "exercise": "Design an error handling system for a library that uses error codes, provides error strings, and automatically cleans up resources on failure using goto patterns."
+    },
+    {
+      "date": "2026-09-29",
+      "title": "Preprocessor and Build Systems",
+      "core_question": "How to manage compile-time configuration?",
+      "things_to_check": [
+        "What's the difference between #define and const?",
+        "How to use #ifdef for platform-specific code?",
+        "What are common pitfalls with macros?",
+        "How to use X macros for code generation?"
+      ],
+      "exercise": "Write a program that uses X macros to generate both an enum and a string array mapping, ensuring they stay in sync."
+    },
+    {
+      "date": "2026-09-30",
+      "title": "GDB and Debugging Techniques",
+      "core_question": "How to effectively debug C programs?",
+      "things_to_check": [
+        "How to set breakpoints and watchpoints?",
+        "How to examine memory and registers?",
+        "How to debug multi-threaded programs?",
+        "How to attach to a running process?"
+      ],
+      "exercise": "Debug a program with a memory leak, a buffer overflow, and a race condition. Find and fix all issues using GDB and other tools."
+    },
+    {
+      "date": "2026-10-01",
+      "title": "Valgrind and Memory Profiling",
+      "core_question": "How to detect memory leaks and errors?",
+      "things_to_check": [
+        "What are the different Valgrind tools?",
+        "How to interpret Memcheck output?",
+        "How to use Callgrind for performance analysis?",
+        "How to use memory checkers in CI pipelines?"
+      ],
+      "exercise": "Analyze a buggy program with Valgrind. Identify and fix all memory errors: leaks, invalid reads/writes, use-after-free, and double frees."
+    },
+    {
+      "date": "2026-10-02",
+      "title": "Inlining and Compiler Optimizations",
+      "core_question": "How does the compiler optimize C code?",
+      "things_to_check": [
+        "What is function inlining and when does it happen?",
+        "What are the -O flags and their effects?",
+        "How to use __attribute__((always_inline))?",
+        "How to read compiler-generated assembly?"
+      ],
+      "exercise": "Write a small computation-intensive function. Examine the generated assembly with different optimization levels. Use the function attribute to force inlining."
+    },
+    {
+      "date": "2026-10-03",
+      "title": "The C Standard Library",
+      "core_question": "What parts of the standard library are safe and efficient?",
+      "things_to_check": [
+        "What are the unsafe functions and their replacements?",
+        "How to use snprintf safely?",
+        "When to use strtok vs strtok_r?",
+        "What are the limitations of standard I/O?"
+      ],
+      "exercise": "Write a simple CSV parser that reads a file, splits lines, and extracts fields. Use only standard library functions and ensure no buffer overflows."
+    },
+    {
+      "date": "2026-10-04",
+      "title": "Floating-Point Arithmetic",
+      "core_question": "How to handle floating-point operations correctly?",
+      "things_to_check": [
+        "What is the IEEE-754 representation?",
+        "How to compare floats safely?",
+        "What are the pitfalls of floating-point accumulation?",
+        "How to use fenv.h for rounding control?"
+      ],
+      "exercise": "Implement a function that calculates the standard deviation of an array. Discuss numerical stability and compare different algorithms."
+    },
+    {
+      "date": "2026-10-05",
+      "title": "Random Number Generation",
+      "core_question": "How to generate cryptographically secure random numbers?",
+      "things_to_check": [
+        "What is the difference between PRNG and CSPRNG?",
+        "How to seed a PRNG properly?",
+        "How to use /dev/urandom?",
+        "What are the pitfalls of rand()?"
+      ],
+      "exercise": "Implement a random password generator that uses getrandom(2) for seed and a high-quality PRNG. Discuss security considerations."
+    },
+    {
+      "date": "2026-10-06",
+      "title": "String Manipulation and Encoding",
+      "core_question": "How to handle text in C safely and efficiently?",
+      "things_to_check": [
+        "What's the difference between ASCII, UTF-8, and wchar_t?",
+        "How to validate UTF-8 input?",
+        "What are the pitfalls of strlen and strcpy?",
+        "How to create efficient string builders?"
+      ],
+      "exercise": "Implement a UTF-8 string validation function. Then implement a function that converts UTF-8 to UTF-32 and back."
+    },
+    {
+      "date": "2026-10-07",
+      "title": "Date and Time Handling",
+      "core_question": "How to handle time correctly across timezones?",
+      "things_to_check": [
+        "What is the difference between time_t and struct tm?",
+        "How to handle timezone conversions?",
+        "What are the leap second issues?",
+        "How to measure elapsed time with clock_gettime?"
+      ],
+      "exercise": "Implement a function that calculates the time difference between two timezones on a specific date. Handle daylight saving transitions."
+    },
+    {
+      "date": "2026-10-08",
+      "title": "Environment Variables and Configuration",
+      "core_question": "How to securely manage configuration in C programs?",
+      "things_to_check": [
+        "How to read environment variables safely?",
+        "What are the security implications?",
+        "How to parse configuration files?",
+        "How to set environment variables for child processes?"
+      ],
+      "exercise": "Write a program that reads configuration from environment variables and a .conf file. Handle default values and override precedence."
+    },
+    {
+      "date": "2026-10-09",
+      "title": "Command Line Argument Parsing",
+      "core_question": "How to build robust CLI interfaces?",
+      "things_to_check": [
+        "What's the difference between getopt and getopt_long?",
+        "How to handle optional arguments?",
+        "How to implement subcommands?",
+        "How to display help text properly?"
+      ],
+      "exercise": "Implement a CLI tool with subcommands (like git). Use getopt_long for options and handle --help and --version flags."
+    },
+    {
+      "date": "2026-10-10",
+      "title": "Wildcard Expansion and Globbing",
+      "core_question": "How to handle file patterns like *.c?",
+      "things_to_check": [
+        "How to use glob() from glob.h?",
+        "What's the difference between shell and system globbing?",
+        "How to handle recursive glob patterns?",
+        "How to expand ~ in paths?"
+      ],
+      "exercise": "Implement a program that takes a glob pattern and processes all matching files. Handle common shell expansions."
+    },
+    {
+      "date": "2026-10-11",
+      "title": "File Locking",
+      "core_question": "How to coordinate access to files?",
+      "things_to_check": [
+        "What's the difference between fcntl, flock, and lockf?",
+        "How to handle mandatory vs advisory locking?",
+        "What are deadlocks and how to avoid them?",
+        "How to lock ranges within a file?"
+      ],
+      "exercise": "Implement a simple database with record-level locking where each record can be locked independently."
+    },
+    {
+      "date": "2026-10-12",
+      "title": "Memory Protection and mprotect",
+      "core_question": "How to control memory access permissions?",
+      "things_to_check": [
+        "How to use mprotect to change page permissions?",
+        "How to catch segmentation faults?",
+        "What is the guard page technique?",
+        "How to implement stack overflow detection?"
+      ],
+      "exercise": "Use mprotect to create a protected memory region. Install a signal handler for SIGSEGV and handle the fault gracefully."
+    },
+    {
+      "date": "2026-10-13",
+      "title": "Allocator Design",
+      "core_question": "How to design your own malloc implementation?",
+      "things_to_check": [
+        "What are the data structures for free lists?",
+        "How to handle fragmentation?",
+        "How to implement a best-fit allocator?",
+        "How to interact with the OS using sbrk and mmap?"
+      ],
+      "exercise": "Implement your own malloc, free, and realloc using a linked list of free blocks. Handle coalescing of adjacent free blocks."
+    },
+    {
+      "date": "2026-10-14",
+      "title": "Stack vs Heap Allocation",
+      "core_question": "When should you use stack vs heap allocation?",
+      "things_to_check": [
+        "What is the typical stack size limit?",
+        "How to detect stack overflow?",
+        "What are the benefits of alloca?",
+        "How to use variable-length arrays safely?"
+      ],
+      "exercise": "Compare the performance of allocating a large array on the stack vs heap. Discuss when to use each approach."
+    },
+    {
+      "date": "2026-10-15",
+      "title": "Integer Overflow and Undefined Behavior",
+      "core_question": "How to detect and prevent integer overflows?",
+      "things_to_check": [
+        "What operations cause undefined behavior?",
+        "How to check for overflow before operations?",
+        "What are the compiler's overflow optimization implications?",
+        "How to use __builtin_add_overflow?"
+      ],
+      "exercise": "Implement safe addition, subtraction, and multiplication functions that return error on overflow. Use compiler builtins when available."
+    },
+    {
+      "date": "2026-10-16",
+      "title": "Inline Assembly",
+      "core_question": "When and how to use assembly in C programs?",
+      "things_to_check": [
+        "What is the GCC extended asm syntax?",
+        "How to specify input/output operands?",
+        "What are clobbered registers?",
+        "When is inline assembly necessary?"
+      ],
+      "exercise": "Write an inline assembly function that reads the CPU timestamp counter (RDTSC) and a CPUID instruction. Compare with compiler intrinsics."
+    },
+    {
+      "date": "2026-10-17",
+      "title": "SIMD and Vectorization",
+      "core_question": "How to leverage CPU vector instructions?",
+      "things_to_check": [
+        "What are SSE, AVX, and NEON?",
+        "How to use compiler auto-vectorization?",
+        "What are intrinsics vs inline assembly?",
+        "How to align data for SIMD?"
+      ],
+      "exercise": "Implement a dot product using SSE intrinsics. Compare performance with scalar code and auto-vectorized code."
+    },
+    {
+      "date": "2026-10-18",
+      "title": "Endianness and Binary Formats",
+      "core_question": "How to read and write portable binary formats?",
+      "things_to_check": [
+        "What's the difference between big-endian and little-endian?",
+        "How to detect endianness at runtime?",
+        "What are the standard binary formats (ELF, PE, Mach-O)?",
+        "How to parse ELF headers?"
+      ],
+      "exercise": "Write a simple ELF parser that reads an ELF file and prints its header, section headers, and program headers."
+    },
+    {
+      "date": "2026-10-19",
+      "title": "Pseudo-Terminals and Process Control",
+      "core_question": "How to create interactive terminal sessions?",
+      "things_to_check": [
+        "What is a pseudo-terminal (pty)?",
+        "How to use forkpty and openpty?",
+        "How to handle terminal signaling?",
+        "How to implement a terminal emulator?"
+      ],
+      "exercise": "Implement a simple terminal multiplexer using pseudo-terminals. Connect to a shell process and handle input/output."
+    },
+    {
+      "date": "2026-10-20",
+      "title": "Daemon Processes",
+      "core_question": "How to create well-behaved background services?",
+      "things_to_check": [
+        "What are the steps to daemonize a process?",
+        "How to handle file descriptors in a daemon?",
+        "What is the double-fork technique?",
+        "How to use systemd for service management?"
+      ],
+      "exercise": "Write a daemon that writes to a log file. Ensure it handles SIGHUP to reopen log files and SIGTERM to exit cleanly."
+    },
+    {
+      "date": "2026-10-21",
+      "title": "Capabilities and Privilege Separation",
+      "core_question": "How to implement least privilege principles?",
+      "things_to_check": [
+        "What are Linux capabilities?",
+        "How to drop privileges using setuid and setcap?",
+        "What is privilege separation?",
+        "How to use chroot or namespaces?"
+      ],
+      "exercise": "Write a network service that binds to a privileged port and then drops privileges to a non-privileged user while maintaining network access."
+    },
+    {
+      "date": "2026-10-22",
+      "title": "System Calls: The Kernel Interface",
+      "core_question": "What happens when you call read or write?",
+      "things_to_check": [
+        "What is the system call number?",
+        "What are the return codes and errno?",
+        "What is the performance cost of a system call?",
+        "How to use syscall() directly?"
+      ],
+      "exercise": "Implement your own getpid() wrapper using syscall(). Trace system call usage with strace."
+    },
+    {
+      "date": "2026-10-23",
+      "title": "Dynamic Library Loading",
+      "core_question": "How to load libraries at runtime?",
+      "things_to_check": [
+        "How to use dlopen, dlsym, and dlclose?",
+        "What are the RTLD_* flags?",
+        "How to handle symbol conflicts?",
+        "How to implement plugins?"
+      ],
+      "exercise": "Implement a plugin system where plugins are loaded from .so files at runtime. Each plugin registers a function to be called."
+    },
+    {
+      "date": "2026-10-24",
+      "title": "Fork and Exec Patterns",
+      "core_question": "How to replace the current process image?",
+      "things_to_check": [
+        "What's the difference between execlp, execvp, execve?",
+        "How to pass environment variables?",
+        "What happens to open file descriptors?",
+        "How to handle exec failures?"
+      ],
+      "exercise": "Write a program that forks and executes child processes. Handle all exec failure cases and preserve file descriptors."
+    },
+    {
+      "date": "2026-10-25",
+      "title": "Signals and Real-time Signals",
+      "core_question": "How to use signals for IPC?",
+      "things_to_check": [
+        "What are real-time signals (SIGRTMIN+)",
+        "How to queue signals?",
+        "How to attach data to signals?",
+        "What are the limitations of traditional signals?"
+      ],
+      "exercise": "Implement a real-time signal-based IPC mechanism where a process sends signals with payload data to another process."
+    },
+    {
+      "date": "2026-10-26",
+      "title": "Thread Cancellation",
+      "core_question": "How to safely terminate a thread?",
+      "things_to_check": [
+        "What is pthread_cancel?",
+        "How to use cancellation points?",
+        "What are cleanup handlers?",
+        "How to avoid resource leaks?"
+      ],
+      "exercise": "Create a thread that performs a long operation. Cancel it safely and ensure all resources are freed using pthread_cleanup_push/pop."
+    },
+    {
+      "date": "2026-10-27",
+      "title": "Thread Pools",
+      "core_question": "How to manage a pool of worker threads?",
+      "things_to_check": [
+        "What is the worker thread pattern?",
+        "How to submit tasks and get results?",
+        "How to handle dynamic task prioritization?",
+        "How to scale thread count?"
+      ],
+      "exercise": "Implement a thread pool with a queue of tasks. Tasks are functions with arguments. Handle task submission and completion."
+    },
+    {
+      "date": "2026-10-28",
+      "title": "Read-Write Locks",
+      "core_question": "How to allow concurrent reads but exclusive writes?",
+      "things_to_check": [
+        "What is the reader-writer lock pattern?",
+        "How to use pthread_rwlock_*?",
+        "What are the starvation concerns?",
+        "How to upgrade from read to write lock?"
+      ],
+      "exercise": "Implement a thread-safe cache using a read-write lock. Multiple threads can read, but writes are exclusive."
+    },
+    {
+      "date": "2026-10-29",
+      "title": "Spinlocks and Busy Waiting",
+      "core_question": "When is busy waiting appropriate?",
+      "things_to_check": [
+        "What's the difference between spinlock and mutex?",
+        "When does spinning beat context switching?",
+        "How to implement a spinlock using atomic operations?",
+        "What's the CPU cache impact?"
+      ],
+      "exercise": "Implement a spinlock using C11 atomics. Compare performance with mutex for very short critical sections."
+    },
+    {
+      "date": "2026-10-30",
+      "title": "Barriers and Synchronization Patterns",
+      "core_question": "How to synchronize groups of threads?",
+      "things_to_check": [
+        "What is a pthread_barrier?",
+        "How to implement a custom barrier?",
+        "What are the phase synchronization patterns?",
+        "How to use barrier in iterative algorithms?"
+      ],
+      "exercise": "Implement a parallel reduction algorithm that uses a barrier to synchronize threads after each reduction step."
+    },
+    {
+      "date": "2026-10-31",
+      "title": "Lock-Free Data Structures",
+      "core_question": "How to implement data structures without locks?",
+      "things_to_check": [
+        "What are Compare-And-Swap (CAS) operations?",
+        "What is ABA problem and how to solve it?",
+        "How to implement a lock-free stack?",
+        "What are the benefits and limitations?"
+      ],
+      "exercise": "Implement a lock-free stack using atomic compare-and-exchange. Handle ABA problem with versioning."
+    },
+    {
+      "date": "2026-11-01",
+      "title": "Memory Barriers and Ordering",
+      "core_question": "How does memory reordering affect concurrency?",
+      "things_to_check": [
+        "What are the different memory orderings?",
+        "How to use memory barriers in practice?",
+        "How to implement double-checked locking?",
+        "What are the hardware-specific considerations?"
+      ],
+      "exercise": "Implement a thread-safe singleton using atomic operations and proper memory barriers. Explain the ordering requirements."
+    },
+    {
+      "date": "2026-11-02",
+      "title": "Processor Affinity",
+      "core_question": "How to bind threads to specific CPU cores?",
+      "things_to_check": [
+        "How to use pthread_setaffinity_np?",
+        "How to get CPU topology?",
+        "What are NUMA considerations?",
+        "How to optimize for cache locality?"
+      ],
+      "exercise": "Write a program that detects the CPU topology (cores, sockets, NUMA nodes) and pins worker threads to specific cores."
+    },
+    {
+      "date": "2026-11-03",
+      "title": "Asynchronous I/O (AIO)",
+      "core_question": "How to perform I/O without blocking?",
+      "things_to_check": [
+        "What is POSIX AIO?",
+        "How to use aio_read and aio_write?",
+        "How to wait for AIO completion?",
+        "What are the performance characteristics?"
+      ],
+      "exercise": "Implement a file copy utility using POSIX AIO with multiple concurrent I/O operations."
+    },
+    {
+      "date": "2026-11-04",
+      "title": "The io_uring Interface",
+      "core_question": "How to achieve high-performance I/O on Linux?",
+      "things_to_check": [
+        "What is the io_uring submission/completion model?",
+        "How to use io_uring for file I/O?",
+        "How to handle multiple operations per submission?",
+        "What are the performance benefits?"
+      ],
+      "exercise": "Write a file server using io_uring that handles concurrent read/write requests. Compare performance with epoll-based server."
+    },
+    {
+      "date": "2026-11-05",
+      "title": "Networking: TCP vs UDP Performance",
+      "core_question": "How to choose the right transport protocol?",
+      "things_to_check": [
+        "What are the performance characteristics?",
+        "How to use TCP_CORK and MSG_MORE?",
+        "How to implement UDP reliability?",
+        "What is TCP offload?"
+      ],
+      "exercise": "Benchmark message throughput for TCP and UDP. Implement a simple reliable protocol over UDP with ACKs and retries."
+    },
+    {
+      "date": "2026-11-06",
+      "title": "DNS Resolution",
+      "core_question": "How to resolve hostnames to IP addresses?",
+      "things_to_check": [
+        "What is the difference between gethostbyname and getaddrinfo?",
+        "How to handle DNS timeouts?",
+        "How to implement asynchronous DNS?",
+        "What are the caching implications?"
+      ],
+      "exercise": "Implement a DNS resolver that can resolve hostnames asynchronously using getaddrinfo with a timeout."
+    },
+    {
+      "date": "2026-11-07",
+      "title": "SSL/TLS with OpenSSL",
+      "core_question": "How to secure network communications?",
+      "things_to_check": [
+        "What is the TLS handshake?",
+        "How to use SSL_read and SSL_write?",
+        "How to handle certificate validation?",
+        "What are the performance considerations?"
+      ],
+      "exercise": "Implement a simple HTTPS client that makes a request to a server, validates the certificate, and processes the response."
+    },
+    {
+      "date": "2026-11-08",
+      "title": "Sockets and Non-Blocking Patterns",
+      "core_question": "How to structure non-blocking network servers?",
+      "things_to_check": [
+        "How to combine non-blocking sockets with epoll?",
+        "How to handle EAGAIN and EWOULDBLOCK?",
+        "How to implement a state machine for connections?",
+        "How to handle timeouts?"
+      ],
+      "exercise": "Implement a non-blocking HTTP server using epoll. Handle partial reads/writes and manage connection state."
+    },
+    {
+      "date": "2026-11-09",
+      "title": "Protocol Buffers",
+      "core_question": "How to design efficient binary protocols?",
+      "things_to_check": [
+        "What is Protobuf serialization format?",
+        "How to use varint encoding?",
+        "What are the field types and tags?",
+        "How to handle protocol evolution?"
+      ],
+      "exercise": "Design a simple binary protocol that serializes key-value pairs with varint length prefixes. Implement a reader and writer."
+    },
+    {
+      "date": "2026-11-10",
+      "title": "Circular Buffers",
+      "core_question": "How to efficiently buffer streaming data?",
+      "things_to_check": [
+        "What is the producer-consumer buffer pattern?",
+        "How to implement a lock-free circular buffer?",
+        "How to handle overflow and underflow?",
+        "How to use memory-mapped circular buffers?"
+      ],
+      "exercise": "Implement a lock-free circular buffer for a producer-consumer pattern using atomic head and tail pointers."
+    },
+    {
+      "date": "2026-11-11",
+      "title": "State Machines in C",
+      "core_question": "How to model stateful protocols clearly?",
+      "things_to_check": [
+        "What are the different state machine patterns?",
+        "How to use function pointers for state transitions?",
+        "How to handle events and timeouts?",
+        "How to test state machines?"
+      ],
+      "exercise": "Implement a TCP connection state machine (CLOSED, LISTEN, SYN_SENT, SYN_RCVD, ESTABLISHED) with event handlers."
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Finite State Machines and Tables",
+      "core_question": "How to implement efficient state transitions?",
+      "things_to_check": [
+        "How to use state transition tables?",
+        "What are the benefits over if/switch?",
+        "How to handle nested states?",
+        "How to generate code from state diagrams?"
+      ],
+      "exercise": "Implement a parser for a simple protocol using a state transition table (2D array of next states and actions)."
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Code Generation and Preprocessing",
+      "core_question": "How to generate boilerplate code automatically?",
+      "things_to_check": [
+        "How to use the C preprocessor for code generation?",
+        "What are X macros and their variations?",
+        "How to use external code generators?",
+        "How to handle conditional compilation?"
+      ],
+      "exercise": "Use X macros to generate: an enum, a string array, and a function to parse strings to enums. Keep all definitions in sync."
+    },
+    {
+      "date": "2026-11-14",
+      "title": "Unit Testing in C",
+      "core_question": "How to write testable C code?",
+      "things_to_check": [
+        "What are the popular C testing frameworks?",
+        "How to mock dependencies?",
+        "How to test static functions?",
+        "How to measure test coverage?"
+      ],
+      "exercise": "Write a test suite for a string library using a testing framework. Include tests for edge cases and memory leaks."
+    },
+    {
+      "date": "2026-11-15",
+      "title": "Fuzzing C Programs",
+      "core_question": "How to find bugs through automated testing?",
+      "things_to_check": [
+        "What is fuzzing and how does it work?",
+        "How to use American Fuzzy Lop (AFL)?",
+        "How to write a fuzz target?",
+        "How to reproduce and fix crashes?"
+      ],
+      "exercise": "Write a fuzz target for a parser function and run it with AFL. Fix any crashes found."
+    },
+    {
+      "date": "2026-11-16",
+      "title": "AddressSanitizer and UndefinedBehaviorSanitizer",
+      "core_question": "How to find memory errors at runtime?",
+      "things_to_check": [
+        "How to enable sanitizers in GCC/Clang?",
+        "What types of bugs does ASan catch?",
+        "How to interpret sanitizer output?",
+        "How to use UBSan for undefined behavior?"
+      ],
+      "exercise": "Compile a buggy program with AddressSanitizer and UBSan. Fix all detected issues including buffer overflows and signed integer overflows."
+    },
+    {
+      "date": "2026-11-17",
+      "title": "Coverage Analysis",
+      "core_question": "How to measure code coverage?",
+      "things_to_check": [
+        "How to use gcov and lcov?",
+        "What are the different coverage types?",
+        "How to get coverage reports?",
+        "How to improve test coverage?"
+      ],
+      "exercise": "Run tests with coverage enabled. Analyze the coverage report and identify untested code paths. Write additional tests."
+    },
+    {
+      "date": "2026-11-18",
+      "title": "Symbol Tables and Debug Information",
+      "core_question": "How to preserve and use debugging symbols?",
+      "things_to_check": [
+        "What is DWARF debug information?",
+        "How to compile with debug symbols?",
+        "How to strip binaries for release?",
+        "How to use debug info with GDB?"
+      ],
+      "exercise": "Compile a program with and without debug symbols. Compare sizes. Write a script to extract function names from the debug info."
+    },
+    {
+      "date": "2026-11-19",
+      "title": "Static Analysis with Clang",
+      "core_question": "How to find bugs without running the program?",
+      "things_to_check": [
+        "What are the common static analyzers?",
+        "How to use clang-tidy?",
+        "What are the false positive handling strategies?",
+        "How to integrate static analysis in CI?"
+      ],
+      "exercise": "Set up clang-tidy for a project. Fix all warnings and add comments for suppressed false positives."
+    },
+    {
+      "date": "2026-11-20",
+      "title": "String Handling in C",
+      "core_question": "How to avoid common string pitfalls?",
+      "things_to_check": [
+        "What are the secure alternatives to strcpy?",
+        "How to build strings efficiently?",
+        "How to handle Unicode?",
+        "How to use strlcpy and strlcat?"
+      ],
+      "exercise": "Rewrite a function that has strcpy and strcat issues. Use safe functions and provide clear error handling."
+    },
+    {
+      "date": "2026-11-21",
+      "title": "Dynamic Arrays",
+      "core_question": "How to implement resizable arrays efficiently?",
+      "things_to_check": [
+        "What is the amortized growth strategy?",
+        "How to handle reallocation?",
+        "How to avoid leaks on resize failure?",
+        "How to store user-defined types?"
+      ],
+      "exercise": "Implement a dynamic array (vector) with append, pop, and insert operations. Use doubling for growth."
+    },
+    {
+      "date": "2026-11-22",
+      "title": "Hash Tables",
+      "core_question": "How to implement efficient key-value storage?",
+      "things_to_check": [
+        "What are the collision resolution strategies?",
+        "How to choose a hash function?",
+        "How to handle rehashing?",
+        "How to make it thread-safe?"
+      ],
+      "exercise": "Implement a hash table with chaining. Include operations: insert, lookup, delete, and print distribution."
+    },
+    {
+      "date": "2026-11-23",
+      "title": "Trees and Traversals",
+      "core_question": "How to implement hierarchical data structures?",
+      "things_to_check": [
+        "What are the binary tree traversal methods?",
+        "How to implement iterative traversals?",
+        "How to handle balanced trees?",
+        "How to avoid stack overflow in recursion?"
+      ],
+      "exercise": "Implement a binary search tree with insert, search, and delete. Write iterative and recursive traversals: inorder, preorder, postorder."
+    },
+    {
+      "date": "2026-11-24",
+      "title": "Red-Black Trees",
+      "core_question": "How to implement self-balancing trees?",
+      "things_to_check": [
+        "What are the properties of Red-Black trees?",
+        "How are rotations used for rebalancing?",
+        "How to handle insertion and deletion cases?",
+        "How does it compare to AVL trees?"
+      ],
+      "exercise": "Implement a Red-Black tree with insertion and deletion. Include verification of Red-Black properties."
+    },
+    {
+      "date": "2026-11-25",
+      "title": "Sorting Algorithms",
+      "core_question": "How to choose the right sorting algorithm?",
+      "things_to_check": [
+        "What are the performance characteristics of each?",
+        "How to implement merge sort?",
+        "How to implement quicksort?",
+        "What are the stability considerations?"
+      ],
+      "exercise": "Implement merge sort, quicksort, and heap sort. Benchmark them on various data distributions (random, sorted, reverse sorted)."
+    },
+    {
+      "date": "2026-11-26",
+      "title": "External Sorting",
+      "core_question": "How to sort data that doesn't fit in memory?",
+      "things_to_check": [
+        "What is the external merge sort algorithm?",
+        "How to choose the number of runs?",
+        "How to handle multi-way merging?",
+        "What are the I/O optimization strategies?"
+      ],
+      "exercise": "Implement external sorting for a large file using k-way merge. Sort records and write back to file."
+    },
+    {
+      "date": "2026-11-27",
+      "title": "Linked Lists",
+      "core_question": "When should you use linked lists?",
+      "things_to_check": [
+        "What are the advantages over arrays?",
+        "How to implement singly and doubly linked lists?",
+        "How to detect cycles?",
+        "What are the cache locality issues?"
+      ],
+      "exercise": "Implement a doubly linked list with insert, delete, and reverse operations. Add cycle detection."
+    },
+    {
+      "date": "2026-11-28",
+      "title": "Bloom Filters",
+      "core_question": "How to check set membership with tunable false positives?",
+      "things_to_check": [
+        "How does a Bloom filter work?",
+        "How to choose the number of hash functions?",
+        "What are the space vs false positive tradeoffs?",
+        "How to implement a counting Bloom filter?"
+      ],
+      "exercise": "Implement a Bloom filter with support for insert and check. Experiment with different hash function counts."
+    },
+    {
+      "date": "2026-11-29",
+      "title": "LRU Cache",
+      "core_question": "How to implement a least-recently-used cache?",
+      "things_to_check": [
+        "What data structures are best for LRU?",
+        "How to combine hash map and linked list?",
+        "How to handle concurrency?",
+        "How to implement expiration?"
+      ],
+      "exercise": "Implement an LRU cache with O(1) operations. Include get and put with automatic eviction."
+    },
+    {
+      "date": "2026-11-30",
+      "title": "Priority Queues and Heaps",
+      "core_question": "How to manage items by priority?",
+      "things_to_check": [
+        "How to implement a binary heap?",
+        "What are the heapify operations?",
+        "How to implement heap sort?",
+        "How to implement a d-ary heap?"
+      ],
+      "exercise": "Implement a max-heap with insert, extract-max, and increase-key operations. Use it to implement heap sort."
+    },
+    {
+      "date": "2026-12-01",
+      "title": "Tries and Prefix Trees",
+      "core_question": "How to efficiently store and search strings?",
+      "things_to_check": [
+        "What are the benefits of a trie over a hash table?",
+        "How to implement a compressed trie?",
+        "How to handle string completion?",
+        "How to store additional metadata?"
+      ],
+      "exercise": "Implement an auto-complete system using a trie. Support inserting words and retrieving all words with a given prefix."
+    },
+    {
+      "date": "2026-12-02",
+      "title": "Graph Algorithms",
+      "core_question": "How to represent and traverse graphs?",
+      "things_to_check": [
+        "What are adjacency lists vs matrices?",
+        "How to implement BFS and DFS?",
+        "How to find shortest paths?",
+        "How to detect cycles?"
+      ],
+      "exercise": "Implement a graph with adjacency list. Add BFS and DFS traversals. Implement topological sort."
+    },
+    {
+      "date": "2026-12-03",
+      "title": "Dijkstra's Algorithm",
+      "core_question": "How to find shortest paths in weighted graphs?",
+      "things_to_check": [
+        "What is the algorithm's complexity?",
+        "How to use a priority queue?",
+        "How to handle negative edges?",
+        "What are the optimization strategies?"
+      ],
+      "exercise": "Implement Dijkstra's algorithm using a min-heap. Test on a road network and print shortest paths."
+    },
+    {
+      "date": "2026-12-04",
+      "title": "Minimum Spanning Trees",
+      "core_question": "How to find a minimum spanning tree?",
+      "things_to_check": [
+        "What is the difference between Prim's and Kruskal's?",
+        "How to implement disjoint set union?",
+        "What are the edge-case handling strategies?",
+        "How to prove correctness?"
+      ],
+      "exercise": "Implement Kruskal's algorithm with union-find. Test on a graph with cycles."
+    },
+    {
+      "date": "2026-12-05",
+      "title": "Regex Engines in C",
+      "core_question": "How to implement pattern matching?",
+      "things_to_check": [
+        "What are the NFA vs DFA approaches?",
+        "How to implement a backtracking engine?",
+        "How to handle Kleene star and alternation?",
+        "What are the performance pitfalls?"
+      ],
+      "exercise": "Implement a simple regex matcher supporting '^', '$', '.', '*', and character classes. Use recursive descent."
+    },
+    {
+      "date": "2026-12-06",
+      "title": "JSON Parsing in C",
+      "core_question": "How to write an efficient JSON parser?",
+      "things_to_check": [
+        "What are the tokenization stages?",
+        "How to build the parse tree?",
+        "How to handle character encoding?",
+        "How to support streaming parsing?"
+      ],
+      "exercise": "Implement a JSON parser that builds a DOM tree. Support parse and pretty-print operations."
+    },
+    {
+      "date": "2026-12-07",
+      "title": "Base64 Encoding",
+      "core_question": "How to encode binary data as text?",
+      "things_to_check": [
+        "What is the Base64 alphabet?",
+        "How to handle padding?",
+        "What are the encoding/decoding pitfalls?",
+        "How to optimize for performance?"
+      ],
+      "exercise": "Implement Base64 encode and decode functions. Include URL-safe variants and benchmark throughput."
+    },
+    {
+      "date": "2026-12-08",
+      "title": "CRC and Checksums",
+      "core_question": "How to detect data corruption?",
+      "things_to_check": [
+        "What are CRC32 and other algorithms?",
+        "How to implement CRC computation?",
+        "How to detect accidental vs malicious corruption?",
+        "How to choose the right checksum?"
+      ],
+      "exercise": "Implement CRC32 and compare with a simple checksum. Test on various data patterns."
+    },
+    {
+      "date": "2026-12-09",
+      "title": "Hashing Algorithms",
+      "core_question": "How to choose and implement hash functions?",
+      "things_to_check": [
+        "What are the characteristics of a good hash function?",
+        "How to implement FNV, MurmurHash, etc.?",
+        "What is hash table collision handling?",
+        "How to protect against hash flooding attacks?"
+      ],
+      "exercise": "Implement FNV-1a hash for strings. Create a benchmark to test distribution and collision rates."
+    },
+    {
+      "date": "2026-12-10",
+      "title": "String Algorithms: Levenshtein Distance",
+      "core_question": "How to measure string similarity?",
+      "things_to_check": [
+        "What is the dynamic programming solution?",
+        "How to optimize space usage?",
+        "How to handle Unicode?",
+        "What are the practical applications?"
+      ],
+      "exercise": "Implement Levenshtein distance with O(mn) time and O(min(m,n)) space. Add support for weighted costs."
+    },
+    {
+      "date": "2026-12-11",
+      "title": "Memory Mapped Files",
+      "core_question": "How to access files as memory?",
+      "things_to_check": [
+        "How to use mmap vs read/write?",
+        "What are the performance implications?",
+        "How to handle file size changes?",
+        "How to use shared memory via mmap?"
+      ],
+      "exercise": "Write a program that maps a large file into memory and processes it. Compare performance with read/write loop."
+    },
+    {
+      "date": "2026-12-12",
+      "title": "Non-Blocking Sockets",
+      "core_question": "How to handle non-blocking network I/O?",
+      "things_to_check": [
+        "How to set a socket to non-blocking mode?",
+        "How to handle EAGAIN/EWOULDBLOCK?",
+        "How to monitor multiple sockets?",
+        "How to avoid busy loops?"
+      ],
+      "exercise": "Write a non-blocking TCP client that connects to a server, sends a request, and handles partial sends/recvs."
+    },
+    {
+      "date": "2026-12-13",
+      "title": "Event Loops",
+      "core_question": "How to structure event-driven programs?",
+      "things_to_check": [
+        "What is the event loop pattern?",
+        "How to handle timers and I/O in one loop?",
+        "How to avoid blocking in event handlers?",
+        "How to implement a simple event loop?"
+      ],
+      "exercise": "Implement a simple event loop that monitors file descriptors and timers. Add a callback system."
+    },
+    {
+      "date": "2026-12-14",
+      "title": "Asynchronous HTTP Client",
+      "core_question": "How to make HTTP requests without blocking?",
+      "things_to_check": [
+        "How to parse HTTP responses?",
+        "How to handle connection reuse?",
+        "How to implement retries and timeouts?",
+        "How to handle multiple requests concurrently?"
+      ],
+      "exercise": "Implement an asynchronous HTTP client using non-blocking sockets and epoll. Support HTTP/1.1 with persistent connections."
+    },
+    {
+      "date": "2026-12-15",
+      "title": "Load Balancing and Round Robin",
+      "core_question": "How to distribute work across workers?",
+      "things_to_check": [
+        "What are the different load balancing strategies?",
+        "How to implement round robin?",
+        "How to handle worker failures?",
+        "How to implement weighted distribution?"
+      ],
+      "exercise": "Implement a round-robin load balancer that distributes client connections to a pool of backend servers."
+    },
+    {
+      "date": "2026-12-16",
+      "title": "Rate Limiting",
+      "core_question": "How to control the rate of requests?",
+      "things_to_check": [
+        "What is the token bucket algorithm?",
+        "How to implement the leaky bucket?",
+        "How to handle distributed rate limiting?",
+        "How to avoid lock contention?"
+      ],
+      "exercise": "Implement a token bucket rate limiter. Support burst capacity and refill rate. Add thread safety."
+    },
+    {
+      "date": "2026-12-17",
+      "title": "Object Pooling",
+      "core_question": "How to reuse expensive objects?",
+      "things_to_check": [
+        "What are the benefits of object pooling?",
+        "How to implement a connection pool?",
+        "How to handle object lifecycle?",
+        "How to test pool implementation?"
+      ],
+      "exercise": "Implement a database connection pool that creates connections on demand and reuses them."
+    },
+    {
+      "date": "2026-12-18",
+      "title": "RPC Frameworks in C",
+      "core_question": "How to implement remote procedure calls?",
+      "things_to_check": [
+        "What is the serialization and deserialization?",
+        "How to handle transport and marshalling?",
+        "How to manage request-response matching?",
+        "How to handle timeouts?"
+      ],
+      "exercise": "Implement a simple RPC system with a protocol that handles serialization, request/response correlation, and retries."
+    },
+    {
+      "date": "2026-12-19",
+      "title": "Backpressure and Flow Control",
+      "core_question": "How to avoid overwhelming consumer?",
+      "things_to_check": [
+        "What is backpressure and why is it needed?",
+        "How to implement event-based backpressure?",
+        "How to handle buffer overruns?",
+        "How to implement adaptive flow control?"
+      ],
+      "exercise": "Implement a producer-consumer system with backpressure where the producer slows down when the queue is full."
+    },
+    {
+      "date": "2026-12-20",
+      "title": "Configurable Logging",
+      "core_question": "How to implement a flexible logging system?",
+      "things_to_check": [
+        "How to support multiple log levels?",
+        "How to format log messages?",
+        "How to configure outputs (file, syslog, stdout)?",
+        "How to make it thread-safe?"
+      ],
+      "exercise": "Implement a logging library with configurable levels, formatting, and outputs. Support rotation and thread safety."
+    },
+    {
+      "date": "2026-12-21",
+      "title": "Metrics and Monitoring",
+      "core_question": "How to expose application metrics?",
+      "things_to_check": [
+        "How to track request rates and latencies?",
+        "How to expose metrics to monitoring systems?",
+        "How to avoid performance impact?",
+        "How to aggregate metrics?"
+      ],
+      "exercise": "Add metrics to a server: request count, request duration, and error count. Expose them via an HTTP endpoint."
+    },
+    {
+      "date": "2026-12-22",
+      "title": "Health Checks",
+      "core_question": "How to implement liveness and readiness probes?",
+      "things_to_check": [
+        "What is the difference between liveness and readiness?",
+        "How to implement health endpoints?",
+        "How to check dependencies?",
+        "How to handle startup delays?"
+      ],
+      "exercise": "Add liveness and readiness endpoints to a server. Include checks for database and external dependencies."
+    },
+    {
+      "date": "2026-12-23",
+      "title": "Signal Handling in Servers",
+      "core_question": "How to handle signals in long-running processes?",
+      "things_to_check": [
+        "How to handle SIGTERM gracefully?",
+        "How to implement hot reload on SIGHUP?",
+        "How to avoid signal race conditions?",
+        "How to use signalfd?"
+      ],
+      "exercise": "Implement a server that reloads its configuration on SIGHUP and exits gracefully on SIGTERM."
+    },
+    {
+      "date": "2026-12-24",
+      "title": "Compression with zlib",
+      "core_question": "How to compress and decompress data in C?",
+      "things_to_check": [
+        "How to use zlib streaming API?",
+        "How to handle compressed data in chunks?",
+        "How to choose compression level?",
+        "How to handle memory allocation?"
+      ],
+      "exercise": "Implement a utility that compresses files using zlib. Add decompression and streaming support."
+    },
+    {
+      "date": "2026-12-25",
+      "title": "B-Trees",
+      "core_question": "How to implement a balanced disk-friendly tree?",
+      "things_to_check": [
+        "What are the B-tree properties?",
+        "How to handle split and merge?",
+        "How to optimize for disk I/O?",
+        "How to implement B+ tree?"
+      ],
+      "exercise": "Implement an in-memory B-tree with support for insert, search, and range queries."
+    },
+    {
+      "date": "2026-12-26",
+      "title": "LSM Trees",
+      "core_question": "How to implement log-structured merge trees?",
+      "things_to_check": [
+        "What are the components of an LSM tree?",
+        "How to handle compaction?",
+        "How to implement memtables and SSTables?",
+        "What are the read amplification concerns?"
+      ],
+      "exercise": "Implement a simple LSM tree with in-memory memtable and disk SSTables. Support compaction."
+    },
+    {
+      "date": "2026-12-27",
+      "title": "Write-Ahead Logging",
+      "core_question": "How to ensure durability in storage systems?",
+      "things_to_check": [
+        "What is a WAL and why is it needed?",
+        "How to write to a WAL durably?",
+        "How to recover from a WAL?",
+        "How to handle checkpointing?"
+      ],
+      "exercise": "Implement a simple key-value store with a write-ahead log for durability. Recover state from the log on startup."
+    },
+    {
+      "date": "2026-12-28",
+      "title": "Concurrent Data Structures",
+      "core_question": "How to make data structures thread-safe?",
+      "things_to_check": [
+        "What are the different concurrency strategies?",
+        "How to implement a concurrent queue?",
+        "How to handle lock contention?",
+        "How to use lock-free techniques?"
+      ],
+      "exercise": "Implement a thread-safe queue with multiple producers and consumers using mutexes. Then implement a lock-free version."
+    },
+    {
+      "date": "2026-12-29",
+      "title": "Readers-Writers Problem",
+      "core_question": "How to manage concurrent access to shared data?",
+      "things_to_check": [
+        "What are the reader-writer solutions?",
+        "How to implement writer-priority?",
+        "How to implement reader-priority?",
+        "How to avoid starvation?"
+      ],
+      "exercise": "Implement a shared database with reader-writer locks. Include scenarios where writers have priority."
+    },
+    {
+      "date": "2026-12-30",
+      "title": "Producer-Consumer",
+      "core_question": "How to coordinate between producers and consumers?",
+      "things_to_check": [
+        "How to implement a bounded buffer?",
+        "How to handle full/empty conditions?",
+        "How to implement multiple producers/consumers?",
+        "How to use condition variables?"
+      ],
+      "exercise": "Implement a bounded buffer with pthreads condition variables. Test with multiple producers and consumers."
+    },
+    {
+      "date": "2026-12-31",
+      "title": "Atomic vs Locking Performance",
+      "core_question": "When to use atomic operations vs locks?",
+      "things_to_check": [
+        "What are the performance differences?",
+        "How to measure and compare?",
+        "What are the scalability implications?",
+        "How to choose the right synchronization?"
+      ],
+      "exercise": "Benchmark a counter with mutex, spinlock, and atomic operations. Analyze scalability with increasing threads."
+    },
+    {
+      "date": "2027-01-01",
+      "title": "Message Passing with MPI",
+      "core_question": "How to implement distributed computing?",
+      "things_to_check": [
+        "What is the MPI programming model?",
+        "How to send/receive messages?",
+        "How to handle collective operations?",
+        "What are the communication patterns?"
+      ],
+      "exercise": "Implement a distributed sum across MPI processes. Each process computes a partial sum, and the root aggregates."
+    },
+    {
+      "date": "2027-01-02",
+      "title": "OpenMP and Parallel Programming",
+      "core_question": "How to parallelize loops in C?",
+      "things_to_check": [
+        "What is OpenMP and its pragmas?",
+        "How to use #pragma omp parallel for?",
+        "How to handle reductions?",
+        "How to manage data sharing?"
+      ],
+      "exercise": "Parallelize a matrix multiplication using OpenMP. Analyze performance scaling."
+    },
+    {
+      "date": "2027-01-03",
+      "title": "SIMD with OpenCL",
+      "core_question": "How to leverage GPUs for computation?",
+      "things_to_check": [
+        "What is the OpenCL programming model?",
+        "How to write kernels?",
+        "How to manage buffer transfers?",
+        "How to optimize for GPU architecture?"
+      ],
+      "exercise": "Implement a vector addition in OpenCL. Compare performance with CPU implementation."
+    },
+    {
+      "date": "2027-01-04",
+      "title": "Caches and Prefetching",
+      "core_question": "How to optimize for cache efficiency?",
+      "things_to_check": [
+        "How to use __builtin_prefetch?",
+        "What are the cache levels and sizes?",
+        "How to avoid cache thrashing?",
+        "How to design cache-friendly data structures?"
+      ],
+      "exercise": "Implement a matrix multiplication with and without prefetching. Measure performance differences."
+    },
+    {
+      "date": "2027-01-05",
+      "title": "Branch Prediction",
+      "core_question": "How does branch prediction affect performance?",
+      "things_to_check": [
+        "How to avoid costly mispredictions?",
+        "How to use __builtin_expect?",
+        "How to restructure code for better prediction?",
+        "What are the performance impacts?"
+      ],
+      "exercise": "Write a loop with a branch that is hard to predict. Use __builtin_expect and compare performance."
+    },
+    {
+      "date": "2027-01-06",
+      "title": "Compiler Barriers",
+      "core_question": "How to control compiler optimizations?",
+      "things_to_check": [
+        "What are compiler barriers and why needed?",
+        "How to use asm volatile?",
+        "How to prevent reordering?",
+        "How to interact with memory barriers?"
+      ],
+      "exercise": "Write a program with reordering issues. Use compiler barriers and memory barriers to enforce ordering."
+    },
+    {
+      "date": "2027-01-07",
+      "title": "Tail Recursion",
+      "core_question": "When and how to use recursion in C?",
+      "things_to_check": [
+        "What is tail recursion?",
+        "How to optimize recursion?",
+        "What are the stack depth limitations?",
+        "How to convert recursion to iteration?"
+      ],
+      "exercise": "Implement factorial recursively and tail-recursively. Compare stack usage. Convert a tree traversal to tail recursion."
+    },
+    {
+      "date": "2027-01-08",
+      "title": "Advanced GDB: Reverse Debugging",
+      "core_question": "How to debug forward and backward in time?",
+      "things_to_check": [
+        "How to use reverse-step and reverse-continue?",
+        "How to record execution?",
+        "When is reverse debugging useful?",
+        "What are the limitations?"
+      ],
+      "exercise": "Record a program execution and use reverse debugging to find the source of a bug that happens late in execution."
+    },
+    {
+      "date": "2027-01-09",
+      "title": "Dynamic Binary Instrumentation",
+      "core_question": "How to analyze programs at runtime?",
+      "things_to_check": [
+        "How to use Intel PIN or DynamoRIO?",
+        "How to collect execution traces?",
+        "How to instrument binary code?",
+        "What are the performance overheads?"
+      ],
+      "exercise": "Use a DBI tool to count how many times each function is called in a program."
+    },
+    {
+      "date": "2027-01-10",
+      "title": "Kernel Modules",
+      "core_question": "How to extend the Linux kernel?",
+      "things_to_check": [
+        "How to write a loadable kernel module?",
+        "How to interact with kernel APIs?",
+        "How to handle concurrency in kernel space?",
+        "How to debug kernel modules?"
+      ],
+      "exercise": "Write a simple kernel module that creates a /proc entry and responds to reads/writes."
+    },
+    {
+      "date": "2027-01-11",
+      "title": "Device Drivers",
+      "core_question": "How to interact with hardware in Linux?",
+      "things_to_check": [
+        "How to handle IO ports and memory mapping?",
+        "How to handle interrupts?",
+        "How to use DMA?",
+        "How to manage device files?"
+      ],
+      "exercise": "Write a virtual character device driver that echoes back data written to it."
+    },
+    {
+      "date": "2027-01-12",
+      "title": "Netfilter and Packet Filtering",
+      "core_question": "How to intercept network packets?",
+      "things_to_check": [
+        "How to use Netfilter hooks?",
+        "How to implement a firewall in kernel?",
+        "How to modify packets in-flight?",
+        "What are the performance considerations?"
+      ],
+      "exercise": "Write a kernel module that logs all incoming packets and drops packets from a specific IP."
+    },
+    {
+      "date": "2027-01-13",
+      "title": "eBPF",
+      "core_question": "How to safely run code in kernel space?",
+      "things_to_check": [
+        "What is eBPF and how does it work?",
+        "How to write eBPF programs?",
+        "How to attach to events (kprobes, tracepoints)?",
+        "How to communicate with userspace?"
+      ],
+      "exercise": "Write an eBPF program that traces system calls and logs them to a ring buffer."
+    },
+    {
+      "date": "2027-01-14",
+      "title": "Containerization and Namespaces",
+      "core_question": "How to isolate processes in containers?",
+      "things_to_check": [
+        "What are Linux namespaces?",
+        "How to use clone to create new namespaces?",
+        "How to set up networking for a container?",
+        "How to combine namespaces for isolation?"
+      ],
+      "exercise": "Write a program that isolates a process in a separate PID and network namespace."
+    },
+    {
+      "date": "2027-01-15",
+      "title": "Resource Limits and cgroups",
+      "core_question": "How to control resource usage?",
+      "things_to_check": [
+        "What are cgroups and how to use them?",
+        "How to limit CPU and memory?",
+        "How to control I/O bandwidth?",
+        "How to use cgroups for per-process limits?"
+      ],
+      "exercise": "Start a process with limited CPU and memory using cgroups. Verify the limits are enforced."
+    },
+    {
+      "date": "2027-01-16",
+      "title": "Seccomp and BPF",
+      "core_question": "How to restrict system calls?",
+      "things_to_check": [
+        "What is seccomp and how to use it?",
+        "How to write seccomp filters?",
+        "How to enforce secure computing?",
+        "How to handle denial of service risks?"
+      ],
+      "exercise": "Sandbox a program to allow only read, write, and exit system calls using seccomp."
+    },
+    {
+      "date": "2027-01-17",
+      "title": "Hardware Breakpoints",
+      "core_question": "How to use hardware debug features?",
+      "things_to_check": [
+        "How to set hardware breakpoints?",
+        "How to use debug registers on x86?",
+        "How to handle debug exceptions?",
+        "How to use watchpoints?"
+      ],
+      "exercise": "Use GDB to set hardware watchpoints on a variable. Observe when it changes and the stack trace."
+    },
+    {
+      "date": "2027-01-18",
+      "title": "Performance Counters",
+      "core_question": "How to measure CPU performance events?",
+      "things_to_check": [
+        "How to use perf_event_open?",
+        "How to count cache misses, branch mispredictions?",
+        "How to interpret performance data?",
+        "How to analyze bottlenecks?"
+      ],
+      "exercise": "Measure cache misses and branch mispredictions for a matrix multiplication program. Optimize based on the measurements."
+    },
+    {
+      "date": "2027-01-19",
+      "title": "Linker and Symbol Resolution",
+      "core_question": "How does the linker resolve symbols?",
+      "things_to_check": [
+        "What are the link-time optimization techniques?",
+        "How to handle weak symbols?",
+        "How to control symbol visibility?",
+        "How to debug linking issues?"
+      ],
+      "exercise": "Create two libraries with conflicting symbols. Use linker options to control symbol resolution."
+    },
+    {
+      "date": "2027-01-20",
+      "title": "Object File Formats",
+      "core_question": "What is inside a .o file?",
+      "things_to_check": [
+        "What are the sections in ELF?",
+        "What is the relocation table?",
+        "How to read object files with readelf/objdump?",
+        "How to inspect symbol tables?"
+      ],
+      "exercise": "Compile a C file and examine its .o file using readelf. Identify sections, symbols, and relocation entries."
+    },
+    {
+      "date": "2027-01-21",
+      "title": "Position Independent Code",
+      "core_question": "How to create relocatable executables?",
+      "things_to_check": [
+        "What is PIC and why is it needed?",
+        "How to compile with -fPIC?",
+        "What is the Global Offset Table?",
+        "How is PIC implemented on different architectures?"
+      ],
+      "exercise": "Compile a program with and without -fPIC. Compare the generated code and explain differences."
+    },
+    {
+      "date": "2027-01-22",
+      "title": "Address Space Layout Randomization",
+      "core_question": "How does ASLR protect against attacks?",
+      "things_to_check": [
+        "What is ASLR and how does it work?",
+        "How to bypass ASLR (for understanding)?",
+        "How to check ASLR status?",
+        "What are the limitations of ASLR?"
+      ],
+      "exercise": "Write a program that prints addresses of stack, heap, and library functions. Run multiple times and observe randomization."
+    },
+    {
+      "date": "2027-01-23",
+      "title": "Stack Canaries",
+      "core_question": "How to detect buffer overflows?",
+      "things_to_check": [
+        "What are stack canaries?",
+        "How to enable stack protection?",
+        "How to implement custom canaries?",
+        "What are the security tradeoffs?"
+      ],
+      "exercise": "Create a program with a buffer overflow vulnerability. Compile with -fstack-protector and observe the crash."
+    },
+    {
+      "date": "2027-01-24",
+      "title": "Format String Attacks",
+      "core_question": "How to avoid format string vulnerabilities?",
+      "things_to_check": [
+        "What is a format string vulnerability?",
+        "How to fix format string bugs?",
+        "How to use __attribute__((format))?",
+        "What are the mitigation strategies?"
+      ],
+      "exercise": "Write a vulnerable program that uses printf with user input. Fix it using a format string specifier."
+    },
+    {
+      "date": "2027-01-25",
+      "title": "Integer Overflow and Security",
+      "core_question": "How can integer overflow lead to security issues?",
+      "things_to_check": [
+        "What are the security implications?",
+        "How to check for overflow?",
+        "How to use safe arithmetic functions?",
+        "How to handle integer underflow?"
+      ],
+      "exercise": "Analyze a code snippet with integer overflow vulnerabilities. Implement safe arithmetic functions."
+    },
+    {
+      "date": "2027-01-26",
+      "title": "Buffer Overflow Exploitation",
+      "core_question": "How do buffer overflows lead to code execution?",
+      "things_to_check": [
+        "What is the stack layout during a function call?",
+        "How to overwrite return addresses?",
+        "How to craft exploit payloads?",
+        "What are the mitigation techniques?"
+      ],
+      "exercise": "Understand a simple buffer overflow exploit on a program without protections. Note: For educational purposes only."
+    },
+    {
+      "date": "2027-01-27",
+      "title": "ROP (Return-Oriented Programming)",
+      "core_question": "How to bypass non-executable stacks?",
+      "things_to_check": [
+        "What is ROP and how does it work?",
+        "How to chain gadgets?",
+        "How to find gadgets in binaries?",
+        "How to defend against ROP attacks?"
+      ],
+      "exercise": "Use ROPgadget to find gadgets in a binary. Chain them to implement a simple operation."
+    },
+    {
+      "date": "2027-01-28",
+      "title": "Secure Coding Practices",
+      "core_question": "What are the best practices for secure C coding?",
+      "things_to_check": [
+        "How to handle user input safely?",
+        "How to avoid injection vulnerabilities?",
+        "How to handle sensitive data securely?",
+        "How to use safe libraries and APIs?"
+      ],
+      "exercise": "Review and fix a codebase with multiple security issues. Document the fixes and the principles applied."
+    },
+    {
+      "date": "2027-01-29",
+      "title": "Cryptographic Randomness",
+      "core_question": "How to generate cryptographically strong randomness?",
+      "things_to_check": [
+        "Why is /dev/urandom preferred?",
+        "How to use getrandom system call?",
+        "What are the entropy sources?",
+        "How to seed a PRNG securely?"
+      ],
+      "exercise": "Implement a secure random token generator using getrandom or /dev/urandom."
+    },
+    {
+      "date": "2027-01-30",
+      "title": "HMAC and Message Authentication",
+      "core_question": "How to verify message integrity and authenticity?",
+      "things_to_check": [
+        "What is HMAC and how does it work?",
+        "How to use HMAC with SHA-256?",
+        "How to compare HMACs safely?",
+        "What are the key management considerations?"
+      ],
+      "exercise": "Implement HMAC-SHA256 for verifying API request signatures."
+    },
+    {
+      "date": "2027-01-31",
+      "title": "Password Hashing",
+      "core_question": "How to store passwords securely?",
+      "things_to_check": [
+        "What is a password hashing algorithm?",
+        "How to use bcrypt or Argon2?",
+        "How to handle salting?",
+        "How to verify passwords?"
+      ],
+      "exercise": "Implement password hashing using bcrypt. Include password verification and handling of invalid passwords."
+    },
+    {
+      "date": "2027-02-01",
+      "title": "Secure Shell",
+      "core_question": "How to implement secure remote access?",
+      "things_to_check": [
+        "What is the SSH protocol?",
+        "How to implement a simple SSH client?",
+        "How to handle host key verification?",
+        "How to use libssh?"
+      ],
+      "exercise": "Write a simple SSH client that authenticates and executes a remote command using libssh."
+    },
+    {
+      "date": "2027-02-02",
+      "title": "Transport Layer Security",
+      "core_question": "How does TLS provide secure connections?",
+      "things_to_check": [
+        "What is the TLS handshake?",
+        "How to use OpenSSL for TLS?",
+        "How to handle certificate verification?",
+        "What are the common TLS vulnerabilities?"
+      ],
+      "exercise": "Implement a TLS client that connects to a server, verifies certificates, and sends an HTTP request."
+    },
+    {
+      "date": "2027-02-03",
+      "title": "OAuth 2.0 and JWT",
+      "core_question": "How to implement delegated authorization?",
+      "things_to_check": [
+        "What is OAuth 2.0 flow?",
+        "How to use JWT for authentication?",
+        "How to verify JWT signatures?",
+        "How to handle token expiration?"
+      ],
+      "exercise": "Implement a JWT token generator and validator. Include proper signature verification."
+    },
+    {
+      "date": "2027-02-04",
+      "title": "C Language Server Protocol",
+      "core_question": "How to implement LSP for C?",
+      "things_to_check": [
+        "What is the Language Server Protocol?",
+        "How to parse C code for completions?",
+        "How to implement go-to-definition?",
+        "How to handle symbol references?"
+      ],
+      "exercise": "Implement a basic LSP server for C that supports code completion and definition lookup."
+    },
+    {
+      "date": "2027-02-05",
+      "title": "Clang Plugins",
+      "core_question": "How to extend the Clang compiler?",
+      "things_to_check": [
+        "How to write Clang plugins?",
+        "How to traverse the AST?",
+        "How to perform custom static analysis?",
+        "How to generate code from AST?"
+      ],
+      "exercise": "Write a Clang plugin that warns about function calls that don't check return values."
+    },
+    {
+      "date": "2027-02-06",
+      "title": "C++ and C Interoperability",
+      "core_question": "How to call C code from C++ and vice versa?",
+      "things_to_check": [
+        "What is extern 'C'?",
+        "How to handle name mangling?",
+        "How to exchange complex types?",
+        "How to handle exceptions across boundaries?"
+      ],
+      "exercise": "Write a C library and call it from C++. Also, write a C++ class and call it from C."
+    },
+    {
+      "date": "2027-02-07",
+      "title": "Python C Extensions",
+      "core_question": "How to write C extensions for Python?",
+      "things_to_check": [
+        "How to use Python C API?",
+        "How to define modules and functions?",
+        "How to handle Python objects?",
+        "How to manage reference counts?"
+      ],
+      "exercise": "Write a Python C extension that implements a high-performance sorting algorithm."
+    },
+    {
+      "date": "2027-02-08",
+      "title": "Rust FFI",
+      "core_question": "How to call C functions from Rust?",
+      "things_to_check": [
+        "How to declare extern C functions?",
+        "How to use unsafe blocks?",
+        "How to handle pointers and memory?",
+        "How to create Rust bindings?"
+      ],
+      "exercise": "Write a C library and call it from Rust using FFI. Also, expose Rust functions to C."
+    },
+    {
+      "date": "2027-02-09",
+      "title": "SQLite Integration",
+      "core_question": "How to embed SQLite in C applications?",
+      "things_to_check": [
+        "How to open and close databases?",
+        "How to execute queries?",
+        "How to prepare statements?",
+        "How to handle transactions?"
+      ],
+      "exercise": "Write a program that creates an SQLite database, inserts records, queries them, and displays results."
+    },
+    {
+      "date": "2027-02-10",
+      "title": "WebSocket Implementation",
+      "core_question": "How to implement WebSocket in C?",
+      "things_to_check": [
+        "What is the WebSocket handshake?",
+        "How to implement frame parsing?",
+        "How to handle masking?",
+        "How to manage connections?"
+      ],
+      "exercise": "Implement a WebSocket server that echoes messages and supports multiple clients."
+    },
+    {
+      "date": "2027-02-11",
+      "title": "MQTT Client",
+      "core_question": "How to implement a lightweight MQTT client?",
+      "things_to_check": [
+        "What is the MQTT protocol?",
+        "How to handle QoS levels?",
+        "How to implement keep-alive?",
+        "How to manage topics?"
+      ],
+      "exercise": "Implement an MQTT client that subscribes to a topic and publishes messages. Use POSIX sockets."
+    },
+    {
+      "date": "2027-02-12",
+      "title": "Protobuf RPC",
+      "core_question": "How to implement gRPC-like RPC with protobuf?",
+      "things_to_check": [
+        "How to define service in .proto?",
+        "How to generate C code?",
+        "How to implement server and client?",
+        "How to handle streaming?"
+      ],
+      "exercise": "Implement a Calculator service using protobuf. Generate C code and implement a server/client."
+    },
+    {
+      "date": "2027-02-13",
+      "title": "Arena Allocators",
+      "core_question": "How to implement region-based memory allocation?",
+      "things_to_check": [
+        "What are arena allocators?",
+        "How to allocate chunks?",
+        "How to reset the arena?",
+        "What are the performance benefits?"
+      ],
+      "exercise": "Implement an arena allocator that allocates from a large buffer. Use it for a parser to reduce fragmentation."
+    },
+    {
+      "date": "2027-02-14",
+      "title": "Object File Generation",
+      "core_question": "How to generate object files programmatically?",
+      "things_to_check": [
+        "How to use ELF format?",
+        "How to write sections?",
+        "How to create symbol tables?",
+        "How to generate relocation entries?"
+      ],
+      "exercise": "Write a program that generates a .o file with a single function. Use a separate loader to execute it."
+    },
+    {
+      "date": "2027-02-15",
+      "title": "Self-Modifying Code",
+      "core_question": "How to modify code at runtime?",
+      "things_to_check": [
+        "How to use mprotect to make code writable?",
+        "What are the performance implications?",
+        "What are the security considerations?",
+        "How to implement JIT compilation?"
+      ],
+      "exercise": "Write a program that modifies a function at runtime to change its behavior. Use mprotect for permissions."
+    },
+    {
+      "date": "2027-02-16",
+      "title": "Language Design",
+      "core_question": "How to design a DSL embedded in C?",
+      "things_to_check": [
+        "How to use macros for DSLs?",
+        "How to create fluent interfaces?",
+        "How to handle error reporting?",
+        "How to make the DSL type-safe?"
+      ],
+      "exercise": "Design a simple SQL-like DSL using macros that builds queries from C expressions."
+    },
+    {
+      "date": "2027-02-17",
+      "title": "Implementing a Debugger",
+      "core_question": "How to trace and control execution?",
+      "things_to_check": [
+        "How to use ptrace?",
+        "How to set breakpoints?",
+        "How to read/write memory?",
+        "How to single-step instructions?"
+      ],
+      "exercise": "Write a simple debugger that can start a program and set breakpoints."
+    },
+    {
+      "date": "2027-02-18",
+      "title": "Disassembling and Reverse Engineering",
+      "core_question": "How to analyze compiled code?",
+      "things_to_check": [
+        "How to use libopcodes?",
+        "How to disassemble instructions?",
+        "How to identify functions?",
+        "How to perform control flow analysis?"
+      ],
+      "exercise": "Write a simple disassembler for x86-64 using Capstone or libopcodes."
+    },
+    {
+      "date": "2027-02-19",
+      "title": "Protocol Fuzzing",
+      "core_question": "How to test network protocols?",
+      "things_to_check": [
+        "How to generate valid/invalid inputs?",
+        "How to handle protocol state?",
+        "How to use AFL for network fuzzing?",
+        "How to monitor crashes?"
+      ],
+      "exercise": "Fuzz a TCP server using AFL with network persistence. Find and document any crashes."
+    },
+    {
+      "date": "2027-02-20",
+      "title": "Concolic Testing",
+      "core_question": "How to combine concrete and symbolic execution?",
+      "things_to_check": [
+        "What is concolic testing?",
+        "How to track symbolic values?",
+        "How to generate test inputs?",
+        "How to use KLEE for testing?"
+      ],
+      "exercise": "Use KLEE to generate test inputs for a function with path constraints."
+    },
+    {
+      "date": "2027-02-21",
+      "title": "Valgrind Plugin Development",
+      "core_question": "How to write a Valgrind tool?",
+      "things_to_check": [
+        "What is the Valgrind tool API?",
+        "How to instrument code?",
+        "How to track memory states?",
+        "How to report errors?"
+      ],
+      "exercise": "Write a simple Valgrind tool that counts read/write operations."
+    },
+    {
+      "date": "2027-02-22",
+      "title": "CPython Interpreter",
+      "core_question": "How does the CPython interpreter work?",
+      "things_to_check": [
+        "How to embed Python in C?",
+        "How to run Python code?",
+        "How to use Python objects?",
+        "How to handle error handling?"
+      ],
+      "exercise": "Embed Python in a C program, run a Python script, and pass data between C and Python."
+    },
+    {
+      "date": "2027-02-23",
+      "title": "Lua Integration",
+      "core_question": "How to embed Lua in C?",
+      "things_to_check": [
+        "How to use the Lua API?",
+        "How to load and run Lua scripts?",
+        "How to expose C functions to Lua?",
+        "How to handle Lua state?"
+      ],
+      "exercise": "Embed Lua in a C program and expose a custom library to Lua scripts."
+    },
+    {
+      "date": "2027-02-24",
+      "title": "HTTP/2 and gRPC",
+      "core_question": "How to implement HTTP/2 in C?",
+      "things_to_check": [
+        "How to handle framing?",
+        "How to implement stream management?",
+        "How to use gRPC over HTTP/2?",
+        "How to handle flow control?"
+      ],
+      "exercise": "Implement a simple HTTP/2 server that handles GET requests with basic frame parsing."
+    },
+    {
+      "date": "2027-02-25",
+      "title": "IP Fragmentation and Reassembly",
+      "core_question": "How to handle fragmented packets?",
+      "things_to_check": [
+        "What is IP fragmentation?",
+        "How to reassemble fragments?",
+        "How to handle out-of-order fragments?",
+        "How to implement timeout for fragments?"
+      ],
+      "exercise": "Implement an IP reassembly module that processes raw packets and reassembles them."
+    },
+    {
+      "date": "2027-02-26",
+      "title": "Network Address Translation",
+      "core_question": "How does NAT work?",
+      "things_to_check": [
+        "What is NAT and its types?",
+        "How to implement connection tracking?",
+        "How to handle port mappings?",
+        "How to implement NAT in userspace?"
+      ],
+      "exercise": "Implement a simple NAT using libnetfilter_conntrack or raw sockets."
+    },
+    {
+      "date": "2027-02-27",
+      "title": "Unix Domain Sockets in Detail",
+      "core_question": "How to leverage UDS for high-performance IPC?",
+      "things_to_check": [
+        "What are SOCK_STREAM vs SOCK_DGRAM vs SOCK_SEQPACKET?",
+        "How to use SCM_RIGHTS for file descriptor passing?",
+        "How to handle credential passing?",
+        "How to implement a UDS-based authentication?"
+      ],
+      "exercise": "Implement a server-client with UDS that passes file descriptors between processes."
+    },
+    {
+      "date": "2027-02-28",
+      "title": "Zero-Copy Networking",
+      "core_question": "How to avoid copying data in network stacks?",
+      "things_to_check": [
+        "What is sendfile and how to use it?",
+        "How to use splice and tee?",
+        "How to use MSG_ZEROCOPY?",
+        "What are the performance benefits?"
+      ],
+      "exercise": "Implement a file server using sendfile to send files without copying to userspace."
+    },
+    {
+      "date": "2027-03-01",
+      "title": "Kernel Bypass and DPDK",
+      "core_question": "How to achieve high-performance networking?",
+      "things_to_check": [
+        "What is DPDK?",
+        "How to use PMD drivers?",
+        "How to handle memory pools and buffers?",
+        "How to implement packet processing?"
+      ],
+      "exercise": "Write a DPDK application that captures and processes packets in userspace."
+    },
+    {
+      "date": "2027-03-02",
+      "title": "Software-Defined Networking",
+      "core_question": "How to implement programmable networks?",
+      "things_to_check": [
+        "What is OpenFlow?",
+        "How to implement a simple switch?",
+        "How to handle flow tables?",
+        "How to use P4 for data plane?"
+      ],
+      "exercise": "Implement an OpenFlow switch in C that forwards packets based on flow entries."
+    },
+    {
+      "date": "2027-03-03",
+      "title": "Cap'n Proto",
+      "core_question": "How to use zero-copy serialization?",
+      "things_to_check": [
+        "What is Cap'n Proto?",
+        "How to define messages?",
+        "How to read and write messages?",
+        "How to handle dynamic messages?"
+      ],
+      "exercise": "Implement a simple message exchange using Cap'n Proto with zero-copy parsing."
+    },
+    {
+      "date": "2027-03-04",
+      "title": "FlatBuffers",
+      "core_question": "How to implement memory-efficient serialization?",
+      "things_to_check": [
+        "What is FlatBuffers?",
+        "How to build messages?",
+        "How to access fields?",
+        "How to handle schema evolution?"
+      ],
+      "exercise": "Use FlatBuffers to implement a high-performance logging format that can be read without deserialization."
+    },
+    {
+      "date": "2027-03-05",
+      "title": "TLS 1.3",
+      "core_question": "What's new in TLS 1.3 and how to use it?",
+      "things_to_check": [
+        "How does TLS 1.3 handshake work?",
+        "How to use session resumption?",
+        "How to implement 0-RTT?",
+        "What are the security improvements?"
+      ],
+      "exercise": "Use OpenSSL to implement a TLS 1.3 client and server with PSK resumption."
+    },
+    {
+      "date": "2027-03-06",
+      "title": "PKI and Certificate Management",
+      "core_question": "How to manage X.509 certificates?",
+      "things_to_check": [
+        "How to generate certificates?",
+        "How to set up a CA?",
+        "How to verify certificate chains?",
+        "How to handle CRLs and OCSP?"
+      ],
+      "exercise": "Generate a root CA certificate and issue a server certificate. Verify the certificate chain."
+    },
+    {
+      "date": "2027-03-07",
+      "title": "ED25519 and Modern Cryptography",
+      "core_question": "How to use modern elliptic curves?",
+      "things_to_check": [
+        "What is Ed25519?",
+        "How to generate keys and signatures?",
+        "How to use libsodium?",
+        "What are the performance benefits?"
+      ],
+      "exercise": "Implement signature generation and verification using Ed25519."
+    },
+    {
+      "date": "2027-03-08",
+      "title": "Multi-Threaded Server Patterns",
+      "core_question": "How to design thread-per-connection vs thread-pool servers?",
+      "things_to_check": [
+        "What are the tradeoffs?",
+        "How to implement thread pool?",
+        "How to handle connection persistence?",
+        "How to handle client disconnects?"
+      ],
+      "exercise": "Implement both a thread-per-connection and a thread-pool server. Compare performance."
+    },
+    {
+      "date": "2027-03-09",
+      "title": "Reactor and Proactor Patterns",
+      "core_question": "How to implement event-driven servers?",
+      "things_to_check": [
+        "What's the difference between reactor and proactor?",
+        "How to implement reactor with epoll?",
+        "How to implement proactor with AIO?",
+        "What are the use cases?"
+      ],
+      "exercise": "Implement a reactor-based server and a proactor-based server. Compare architecture."
+    },
+    {
+      "date": "2027-03-10",
+      "title": "STUN and NAT Traversal",
+      "core_question": "How to handle NATs in P2P communication?",
+      "things_to_check": [
+        "What is STUN protocol?",
+        "How to detect NAT types?",
+        "How to implement binding discovery?",
+        "How to handle TURN relay?"
+      ],
+      "exercise": "Implement a STUN client that discovers its external IP and port."
+    },
+    {
+      "date": "2027-03-11",
+      "title": "WebRTC Data Channel",
+      "core_question": "How to implement peer-to-peer data transfer?",
+      "things_to_check": [
+        "What is WebRTC?",
+        "How to establish a peer connection?",
+        "How to implement data channels?",
+        "How to handle signaling?"
+      ],
+      "exercise": "Implement a simple file transfer using WebRTC data channels with C++ or C bindings."
+    },
+    {
+      "date": "2027-03-12",
+      "title": "QUIC Protocol",
+      "core_question": "How to implement QUIC for low-latency connections?",
+      "things_to_check": [
+        "What is QUIC and how does it work?",
+        "How to handle connection migration?",
+        "How to implement 0-RTT?",
+        "How to use congestion control?"
+      ],
+      "exercise": "Implement a simple QUIC client-server using a library like lsquic or quiche."
+    },
+    {
+      "date": "2027-03-13",
+      "title": "HTTP/3",
+      "core_question": "How to use HTTP/3 effectively?",
+      "things_to_check": [
+        "What's new in HTTP/3?",
+        "How to use it in C applications?",
+        "How to handle streams?",
+        "What are the performance benefits?"
+      ],
+      "exercise": "Write an HTTP/3 client that makes requests using a QUIC library."
+    },
+    {
+      "date": "2027-03-14",
+      "title": "Serial Port Programming",
+      "core_question": "How to communicate with serial devices?",
+      "things_to_check": [
+        "How to open and configure serial ports?",
+        "How to set baud rate and parity?",
+        "How to handle flow control?",
+        "How to read/write asynchronously?"
+      ],
+      "exercise": "Write a program that communicates with a serial device (simulated with loopback)."
+    },
+    {
+      "date": "2027-03-15",
+      "title": "USB HID Programming",
+      "core_question": "How to interact with USB HID devices?",
+      "things_to_check": [
+        "How to use libusb?",
+        "How to detect HID devices?",
+        "How to read reports?",
+        "How to send commands?"
+      ],
+      "exercise": "Write a program that reads keyboard input from a USB HID device using libusb."
+    },
+    {
+      "date": "2027-03-16",
+      "title": "GPIO and Embedded C",
+      "core_question": "How to control hardware pins?",
+      "things_to_check": [
+        "How to use GPIO on Linux?",
+        "How to use sysfs or libgpiod?",
+        "How to handle interrupts?",
+        "How to implement PWM?"
+      ],
+      "exercise": "Write a program that blinks an LED using GPIO on a Raspberry Pi."
+    },
+    {
+      "date": "2027-03-17",
+      "title": "I2C and SPI Protocols",
+      "core_question": "How to communicate with sensors?",
+      "things_to_check": [
+        "How to use i2cdev?",
+        "How to use spidev?",
+        "How to read/write registers?",
+        "How to handle device addresses?"
+      ],
+      "exercise": "Write a program that reads temperature from an I2C sensor."
+    },
+    {
+      "date": "2027-03-18",
+      "title": "MQTT in IoT",
+      "core_question": "How to connect IoT devices with MQTT?",
+      "things_to_check": [
+        "How to use MQTT for IoT?",
+        "How to handle QoS?",
+        "How to manage sessions?",
+        "How to implement security?"
+      ],
+      "exercise": "Implement an MQTT client for an IoT sensor that publishes data periodically."
+    },
+    {
+      "date": "2027-03-19",
+      "title": "CoAP Protocol",
+      "core_question": "How to implement CoAP for constrained devices?",
+      "things_to_check": [
+        "What is CoAP?",
+        "How to implement request/response?",
+        "How to handle observe?",
+        "How to use block transfers?"
+      ],
+      "exercise": "Implement a CoAP server that serves sensor readings to clients."
+    },
+    {
+      "date": "2027-03-20",
+      "title": "LWM2M in C",
+      "core_question": "How to manage IoT devices?",
+      "things_to_check": [
+        "What is LWM2M?",
+        "How to implement device management?",
+        "How to handle firmware updates?",
+        "How to use object model?"
+      ],
+      "exercise": "Implement a simple LWM2M client that reports device information."
+    },
+    {
+      "date": "2027-03-21",
+      "title": "NB-IoT and Cellular",
+      "core_question": "How to connect to cellular networks?",
+      "things_to_check": [
+        "How to use AT commands?",
+        "How to handle network registration?",
+        "How to manage PDP contexts?",
+        "How to send/receive data?"
+      ],
+      "exercise": "Write a program that connects to a cellular modem via AT commands and sends data."
+    },
+    {
+      "date": "2027-03-22",
+      "title": "Embedded Web Servers",
+      "core_question": "How to implement a lightweight web server?",
+      "things_to_check": [
+        "How to handle HTTP parsing?",
+        "How to manage concurrency?",
+        "How to implement static/dynamic routing?",
+        "How to handle resources?"
+      ],
+      "exercise": "Write a lightweight web server that serves static files and supports REST API."
+    },
+    {
+      "date": "2027-03-23",
+      "title": "JSON Web Tokens in Embedded",
+      "core_question": "How to authenticate embedded devices?",
+      "things_to_check": [
+        "How to implement JWT on constrained devices?",
+        "How to handle signature verification?",
+        "How to manage token lifespan?",
+        "How to handle refresh tokens?"
+      ],
+      "exercise": "Implement JWT generation and verification for an embedded device."
+    },
+    {
+      "date": "2027-03-24",
+      "title": "Secure Boot",
+      "core_question": "How to ensure code authenticity?",
+      "things_to_check": [
+        "What is secure boot?",
+        "How to verify bootloader signatures?",
+        "How to handle key management?",
+        "How to implement chain of trust?"
+      ],
+      "exercise": "Design and implement a secure boot process for an embedded system."
+    },
+    {
+      "date": "2027-03-25",
+      "title": "SELinux and Security Policies",
+      "core_question": "How to implement mandatory access control?",
+      "things_to_check": [
+        "How to define SELinux policies?",
+        "How to manage contexts?",
+        "How to enforce policies?",
+        "How to audit violations?"
+      ],
+      "exercise": "Write an SELinux policy for a custom application that restricts file access."
+    },
+    {
+      "date": "2027-03-26",
+      "title": "AppArmor",
+      "core_question": "How to use AppArmor for application security?",
+      "things_to_check": [
+        "What is AppArmor?",
+        "How to write AppArmor profiles?",
+        "How to enforce and audit?",
+        "How to handle deny rules?"
+      ],
+      "exercise": "Write an AppArmor profile for a web server to restrict its capabilities."
+    },
+    {
+      "date": "2027-03-27",
+      "title": "Systemd Service Management",
+      "core_question": "How to manage services with systemd?",
+      "things_to_check": [
+        "How to write systemd service files?",
+        "How to handle dependencies?",
+        "How to handle service failures?",
+        "How to integrate with logging?"
+      ],
+      "exercise": "Create a systemd service for a custom daemon with restart policies."
+    },
+    {
+      "date": "2027-03-28",
+      "title": "Cgroups v2",
+      "core_question": "How to use cgroups v2 for resource control?",
+      "things_to_check": [
+        "What's new in cgroups v2?",
+        "How to configure controllers?",
+        "How to enforce limits?",
+        "How to monitor usage?"
+      ],
+      "exercise": "Write a program that creates a cgroup v2 and limits the CPU/memory of a process."
+    },
+    {
+      "date": "2027-03-29",
+      "title": "User Namespaces",
+      "core_question": "How to implement user namespace isolation?",
+      "things_to_check": [
+        "What is a user namespace?",
+        "How to map UIDs/GIDs?",
+        "How to use unshare or clone?",
+        "How to run unprivileged containers?"
+      ],
+      "exercise": "Write a program that runs a process in a new user namespace with root privileges inside."
+    },
+    {
+      "date": "2027-03-30",
+      "title": "Network Namespace",
+      "core_question": "How to isolate network resources?",
+      "things_to_check": [
+        "How to create network namespaces?",
+        "How to set up veth pairs?",
+        "How to configure routing?",
+        "How to connect to host network?"
+      ],
+      "exercise": "Create a network namespace with a virtual interface and routing rules."
+    },
+    {
+      "date": "2027-03-31",
+      "title": "Mount Namespace",
+      "core_question": "How to isolate filesystem mounts?",
+      "things_to_check": [
+        "How to use mount namespace?",
+        "How to use pivot_root?",
+        "How to handle mount propagation?",
+        "How to create a container rootfs?"
+      ],
+      "exercise": "Write a program that creates a mount namespace with a new root filesystem."
+    },
+    {
+      "date": "2027-04-01",
+      "title": "Overlay Filesystems",
+      "core_question": "How to use overlayfs for container images?",
+      "things_to_check": [
+        "How to mount overlayfs?",
+        "How to handle lowerdirs?",
+        "How to use upperdir for modifications?",
+        "How to manage workdir?"
+      ],
+      "exercise": "Set up an overlay filesystem with multiple lower directories for a container image."
+    },
+    {
+      "date": "2027-04-02",
+      "title": "Container Networking",
+      "core_question": "How to implement container networking?",
+      "things_to_check": [
+        "How to set up veth pairs?",
+        "How to configure bridges?",
+        "How to set up iptables rules?",
+        "How to handle port forwarding?"
+      ],
+      "exercise": "Implement a simple container network using a bridge and veth pairs."
+    },
+    {
+      "date": "2027-04-03",
+      "title": "OCI Runtime Specification",
+      "core_question": "How to implement an OCI-compliant runtime?",
+      "things_to_check": [
+        "What is the OCI runtime spec?",
+        "How to parse config.json?",
+        "How to create containers?",
+        "How to handle lifecycles?"
+      ],
+      "exercise": "Implement a basic OCI runtime that can create and start a container."
+    },
+    {
+      "date": "2027-04-04",
+      "title": "Container Orchestration",
+      "core_question": "How to manage multiple containers?",
+      "things_to_check": [
+        "What is orchestration?",
+        "How to implement a scheduler?",
+        "How to handle service discovery?",
+        "How to manage networking?"
+      ],
+      "exercise": "Write a simple container orchestrator that schedules containers on multiple hosts."
+    },
+    {
+      "date": "2027-04-05",
+      "title": "Service Mesh",
+      "core_question": "How to implement service meshes?",
+      "things_to_check": [
+        "What is a service mesh?",
+        "How to handle service discovery?",
+        "How to implement load balancing?",
+        "How to handle observability?"
+      ],
+      "exercise": "Implement a simple service mesh with a sidecar proxy for load balancing."
+    },
+    {
+      "date": "2027-04-06",
+      "title": "Serverless Architecture",
+      "core_question": "How to implement FaaS in C?",
+      "things_to_check": [
+        "What is serverless?",
+        "How to execute functions on demand?",
+        "How to handle scaling?",
+        "How to manage cold starts?"
+      ],
+      "exercise": "Implement a simple FaaS platform that executes C functions as services."
+    },
+    {
+      "date": "2027-04-07",
+      "title": "WebAssembly in C",
+      "core_question": "How to compile C to WebAssembly?",
+      "things_to_check": [
+        "How to use Emscripten?",
+        "How to call C functions from JavaScript?",
+        "How to handle memory?",
+        "How to integrate with web APIs?"
+      ],
+      "exercise": "Compile a C program to WebAssembly and call it from HTML/JavaScript."
+    },
+    {
+      "date": "2027-04-08",
+      "title": "WASI",
+      "core_question": "How to use WebAssembly outside the browser?",
+      "things_to_check": [
+        "What is WASI?",
+        "How to compile to WASI?",
+        "How to use filesystem and networking?",
+        "How to implement WASI runtime?"
+      ],
+      "exercise": "Write a C program that uses WASI for file I/O and run it with wasmtime."
+    },
+    {
+      "date": "2027-04-09",
+      "title": "JIT Compilation with LLVM",
+      "core_question": "How to implement a JIT compiler?",
+      "things_to_check": [
+        "How to use LLVM ORC JIT?",
+        "How to generate IR at runtime?",
+        "How to optimize JIT code?",
+        "How to handle function calls?"
+      ],
+      "exercise": "Implement a simple JIT compiler that compiles C-like expressions at runtime."
+    },
+    {
+      "date": "2027-04-10",
+      "title": "Garbage Collection in C",
+      "core_question": "How to implement a conservative GC?",
+      "things_to_check": [
+        "What is a conservative GC?",
+        "How to use Boehm GC?",
+        "How to mark and sweep?",
+        "How to handle pointers in memory?"
+      ],
+      "exercise": "Use Boehm GC to implement a garbage-collected linked list."
+    },
+    {
+      "date": "2027-04-11",
+      "title": "Coroutines in C",
+      "core_question": "How to implement coroutines?",
+      "things_to_check": [
+        "What are coroutines?",
+        "How to use setjmp/longjmp for coroutines?",
+        "How to use ucontext?",
+        "How to handle stack allocation?"
+      ],
+      "exercise": "Implement a simple coroutine system that yields and resumes execution."
+    },
+    {
+      "date": "2027-04-12",
+      "title": "Fibers and User-Level Threads",
+      "core_question": "How to implement lightweight threads?",
+      "things_to_check": [
+        "What are fibers?",
+        "How to implement context switching?",
+        "How to handle scheduling?",
+        "How to implement blocking operations?"
+      ],
+      "exercise": "Implement a user-level threading library with fibers and a round-robin scheduler."
+    },
+    {
+      "date": "2027-04-13",
+      "title": "Green Threads",
+      "core_question": "How to implement M:N threading?",
+      "things_to_check": [
+        "What are green threads?",
+        "How to map to kernel threads?",
+        "How to handle blocking I/O?",
+        "How to implement work stealing?"
+      ],
+      "exercise": "Implement a green threading library with work-stealing scheduler."
+    },
+    {
+      "date": "2027-04-14",
+      "title": "Asynchronous I/O Patterns",
+      "core_question": "How to structure async code in C?",
+      "things_to_check": [
+        "How to implement state machines?",
+        "How to use callback chains?",
+        "How to handle error propagation?",
+        "How to implement timeout handling?"
+      ],
+      "exercise": "Implement an asynchronous file copy utility using AIO with callback chains."
+    },
+    {
+      "date": "2027-04-15",
+      "title": "Reentrancy and Thread-Safety",
+      "core_question": "How to write reentrant functions?",
+      "things_to_check": [
+        "What is reentrancy?",
+        "How to avoid global state?",
+        "How to make functions thread-safe?",
+        "How to use thread-local storage?"
+      ],
+      "exercise": "Convert a library with global state to be reentrant by passing state as parameter."
+    },
+    {
+      "date": "2027-04-16",
+      "title": "Crypto Algorithms in C",
+      "core_question": "How to implement AES from scratch?",
+      "things_to_check": [
+        "How does AES work?",
+        "How to implement substitution/permutation?",
+        "How to handle key expansion?",
+        "How to use different modes?"
+      ],
+      "exercise": "Implement AES-128 in ECB mode for educational purposes."
+    },
+    {
+      "date": "2027-04-17",
+      "title": "SHA-256 Implementation",
+      "core_question": "How to implement cryptographic hashing?",
+      "things_to_check": [
+        "What are the SHA-256 compression functions?",
+        "How to pad messages?",
+        "How to handle bit operations?",
+        "How to optimize for performance?"
+      ],
+      "exercise": "Implement SHA-256 from scratch without using OpenSSL."
+    },
+    {
+      "date": "2027-04-18",
+      "title": "RSA Cryptography",
+      "core_question": "How to implement RSA public-key encryption?",
+      "things_to_check": [
+        "What are the mathematical underpinnings?",
+        "How to implement modular exponentiation?",
+        "How to generate key pairs?",
+        "How to handle padding?"
+      ],
+      "exercise": "Implement RSA with small primes for educational purposes."
+    },
+    {
+      "date": "2027-04-19",
+      "title": "Elliptic Curve Cryptography",
+      "core_question": "How to implement ECC?",
+      "things_to_check": [
+        "What are elliptic curves?",
+        "How to implement point addition?",
+        "How to implement scalar multiplication?",
+        "How to use ECDSA?"
+      ],
+      "exercise": "Implement ECDH key exchange using a small elliptic curve for learning."
+    },
+    {
+      "date": "2027-04-20",
+      "title": "Homomorphic Encryption",
+      "core_question": "How to perform computations on encrypted data?",
+      "things_to_check": [
+        "What is homomorphic encryption?",
+        "What are the approaches?",
+        "How to use SEAL?",
+        "What are the practical limitations?"
+      ],
+      "exercise": "Implement a simple homomorphic encryption scheme for small integers."
+    },
+    {
+      "date": "2027-04-21",
+      "title": "Cryptographic Signatures",
+      "core_question": "How to implement digital signatures?",
+      "things_to_check": [
+        "How do signatures work?",
+        "How to sign messages?",
+        "How to verify signatures?",
+        "How to handle key management?"
+      ],
+      "exercise": "Implement a signing utility using Ed25519 with proper key generation."
+    },
+    {
+      "date": "2027-04-22",
+      "title": "Zero-Knowledge Proofs",
+      "core_question": "How to prove knowledge without revealing?",
+      "things_to_check": [
+        "What are ZKPs?",
+        "How to implement a simple proof?",
+        "What is the Fiat-Shamir heuristic?",
+        "How to use zk-SNARKs?"
+      ],
+      "exercise": "Implement a simple zero-knowledge proof for discrete logarithm."
+    },
+    {
+      "date": "2027-04-23",
+      "title": "Secure Multiparty Computation",
+      "core_question": "How to compute with multiple parties securely?",
+      "things_to_check": [
+        "What is MPC?",
+        "How to implement secure sum?",
+        "How to handle malicious parties?",
+        "What are the communication costs?"
+      ],
+      "exercise": "Implement a secure sum protocol with Shamir secret sharing."
+    },
+    {
+      "date": "2027-04-24",
+      "title": "Advanced Networking: BGP",
+      "core_question": "How to implement Border Gateway Protocol?",
+      "things_to_check": [
+        "What is BGP and how does it work?",
+        "How to implement BGP sessions?",
+        "How to handle route updates?",
+        "How to implement BGP policies?"
+      ],
+      "exercise": "Implement a simple BGP speaker that exchanges routes with peers."
+    },
+    {
+      "date": "2027-04-25",
+      "title": "RIP and OSPF",
+      "core_question": "How to implement routing protocols?",
+      "things_to_check": [
+        "What are distance-vector vs link-state?",
+        "How to implement RIP?",
+        "How to implement OSPF?",
+        "How to handle route convergence?"
+      ],
+      "exercise": "Implement a simple RIP daemon that exchanges route information."
+    },
+    {
+      "date": "2027-04-26",
+      "title": "VLAN and 802.1Q",
+      "core_question": "How to implement VLANs?",
+      "things_to_check": [
+        "What is VLAN tagging?",
+        "How to handle VLAN frames?",
+        "How to set up VLAN interfaces?",
+        "How to bridge VLANs?"
+      ],
+      "exercise": "Write a program that parses and creates VLAN-tagged packets using raw sockets."
+    },
+    {
+      "date": "2027-04-27",
+      "title": "Bridging and Switching",
+      "core_question": "How to implement a network bridge?",
+      "things_to_check": [
+        "What is a bridge?",
+        "How to handle forwarding?",
+        "How to implement learning bridge?",
+        "How to handle STP?"
+      ],
+      "exercise": "Implement a learning bridge that forwards Ethernet frames."
+    },
+    {
+      "date": "2027-04-28",
+      "title": "DHCP Implementation",
+      "core_question": "How to assign IP addresses dynamically?",
+      "things_to_check": [
+        "How does DHCP work?",
+        "How to handle discovery/offer/request/ack?",
+        "How to manage leases?",
+        "How to handle DHCP options?"
+      ],
+      "exercise": "Implement a simple DHCP server with static lease allocation."
+    },
+    {
+      "date": "2027-04-29",
+      "title": "DNS Server Implementation",
+      "core_question": "How to implement a DNS server?",
+      "things_to_check": [
+        "How to parse DNS messages?",
+        "How to handle different record types?",
+        "How to implement caching?",
+        "How to handle recursion?"
+      ],
+      "exercise": "Implement an authoritative DNS server for a zone with A, CNAME, MX records."
+    },
+    {
+      "date": "2027-04-30",
+      "title": "NTP Protocol",
+      "core_question": "How to synchronize time across systems?",
+      "things_to_check": [
+        "How does NTP work?",
+        "How to implement time requests?",
+        "How to handle time calculations?",
+        "How to adjust system time?"
+      ],
+      "exercise": "Implement an NTP client that synchronizes with a public server."
+    },
+    {
+      "date": "2027-05-01",
+      "title": "SNMP and Network Management",
+      "core_question": "How to monitor network devices?",
+      "things_to_check": [
+        "How does SNMP work?",
+        "How to implement an SNMP agent?",
+        "How to handle MIBs?",
+        "How to implement traps?"
+      ],
+      "exercise": "Implement a simple SNMP agent that exposes system information."
+    },
+    {
+      "date": "2027-05-02",
+      "title": "BPF and Networking",
+      "core_question": "How to use BPF for packet processing?",
+      "things_to_check": [
+        "How to write BPF programs?",
+        "How to attach to sockets?",
+        "How to drop packets?",
+        "How to handle performance?"
+      ],
+      "exercise": "Write a BPF program that filters and drops packets based on port."
+    },
+    {
+      "date": "2027-05-03",
+      "title": "RDMA and InfiniBand",
+      "core_question": "How to use high-performance networks?",
+      "things_to_check": [
+        "What is RDMA?",
+        "How to use verbs API?",
+        "How to perform remote memory operations?",
+        "What are the performance characteristics?"
+      ],
+      "exercise": "Write a simple RDMA program that transfers memory between nodes."
+    },
+    {
+      "date": "2027-05-04",
+      "title": "Intel SGX",
+      "core_question": "How to use hardware enclaves?",
+      "things_to_check": [
+        "What is SGX?",
+        "How to create enclaves?",
+        "How to do secure computation?",
+        "How to handle attestation?"
+      ],
+      "exercise": "Write a simple enclave application that computes a hash securely."
+    },
+    {
+      "date": "2027-05-05",
+      "title": "Trusted Execution Environments",
+      "core_question": "How to implement secure TEEs?",
+      "things_to_check": [
+        "What are TEEs?",
+        "How to use OP-TEE?",
+        "How to implement secure storage?",
+        "How to handle remote attestation?"
+      ],
+      "exercise": "Implement a trusted application for OP-TEE with secure storage."
+    },
+    {
+      "date": "2027-05-06",
+      "title": "Performance Optimization Techniques",
+      "core_question": "How to identify and fix bottlenecks?",
+      "things_to_check": [
+        "How to use profiling tools?",
+        "How to optimize loops?",
+        "How to reduce cache misses?",
+        "How to use compiler hints?"
+      ],
+      "exercise": "Profile and optimize a matrix multiplication to improve cache utilization."
+    },
+    {
+      "date": "2027-05-07",
+      "title": "HPC with MPI",
+      "core_question": "How to implement high-performance computing?",
+      "things_to_check": [
+        "How to use MPI for communication?",
+        "How to handle collective operations?",
+        "How to parallelize algorithms?",
+        "How to handle load balancing?"
+      ],
+      "exercise": "Parallelize a numerical integration using MPI."
+    },
+    {
+      "date": "2027-05-08",
+      "title": "GPU Programming with CUDA",
+      "core_question": "How to use CUDA in C?",
+      "things_to_check": [
+        "How to write CUDA kernels?",
+        "How to manage memory?",
+        "How to optimize GPU usage?",
+        "How to handle synchronization?"
+      ],
+      "exercise": "Implement matrix multiplication in CUDA and compare with CPU."
+    },
+    {
+      "date": "2027-05-09",
+      "title": "OpenCL in C",
+      "core_question": "How to write cross-platform parallel code?",
+      "things_to_check": [
+        "How to use OpenCL API?",
+        "How to write kernels?",
+        "How to handle context and commands?",
+        "How to manage devices?"
+      ],
+      "exercise": "Implement a Sobel filter using OpenCL for image processing."
+    },
+    {
+      "date": "2027-05-10",
+      "title": "SIMD Programming with Intrinsics",
+      "core_question": "How to use intrinsic functions for vectorization?",
+      "things_to_check": [
+        "What are Intel intrinsics?",
+        "How to use SSE/AVX?",
+        "How to handle data alignment?",
+        "How to optimize for performance?"
+      ],
+      "exercise": "Implement a fast dot product using AVX intrinsics."
+    },
+    {
+      "date": "2027-05-11",
+      "title": "Neural Networks in C",
+      "core_question": "How to implement neural networks?",
+      "things_to_check": [
+        "How to implement matrix operations?",
+        "How to implement backpropagation?",
+        "How to handle activation functions?",
+        "How to optimize inference?"
+      ],
+      "exercise": "Implement a simple feedforward neural network for digit recognition."
+    },
+    {
+      "date": "2027-05-12",
+      "title": "Convolutional Networks",
+      "core_question": "How to implement CNNs in C?",
+      "things_to_check": [
+        "How to implement convolution?",
+        "How to handle pooling?",
+        "How to implement forward pass?",
+        "How to optimize for speed?"
+      ],
+      "exercise": "Implement a convolution layer for image classification."
+    },
+    {
+      "date": "2027-05-13",
+      "title": "Machine Learning Frameworks",
+      "core_question": "How to use TensorFlow C API?",
+      "things_to_check": [
+        "How to load models?",
+        "How to run inference?",
+        "How to handle tensors?",
+        "How to optimize performance?"
+      ],
+      "exercise": "Load a pre-trained TensorFlow model and run inference in C."
+    },
+    {
+      "date": "2027-05-14",
+      "title": "Computer Vision with OpenCV",
+      "core_question": "How to implement image processing?",
+      "things_to_check": [
+        "How to use OpenCV in C?",
+        "How to read/write images?",
+        "How to apply filters?",
+        "How to detect features?"
+      ],
+      "exercise": "Implement edge detection using OpenCV in C."
+    },
+    {
+      "date": "2027-05-15",
+      "title": "Audio Processing",
+      "core_question": "How to manipulate audio data?",
+      "things_to_check": [
+        "How to read WAV files?",
+        "How to apply effects?",
+        "How to handle sample rates?",
+        "How to implement filters?"
+      ],
+      "exercise": "Implement a simple audio equalizer with band-pass filters."
+    },
+    {
+      "date": "2027-05-16",
+      "title": "Video Processing",
+      "core_question": "How to handle video streams?",
+      "things_to_check": [
+        "How to use FFmpeg?",
+        "How to decode/encode?",
+        "How to handle frames?",
+        "How to apply filters?"
+      ],
+      "exercise": "Write a program that extracts frames from a video and applies a filter."
+    },
+    {
+      "date": "2027-05-17",
+      "title": "Compiler Design",
+      "core_question": "How to implement a compiler frontend?",
+      "things_to_check": [
+        "How to implement lexical analysis?",
+        "How to implement parsing?",
+        "How to build an AST?",
+        "How to handle types?"
+      ],
+      "exercise": "Write a recursive descent parser for a simple expression language."
+    },
+    {
+      "date": "2027-05-18",
+      "title": "Code Generation",
+      "core_question": "How to generate assembly from AST?",
+      "things_to_check": [
+        "How to handle registers?",
+        "How to generate code for expressions?",
+        "How to handle control flow?",
+        "How to optimize code?"
+      ],
+      "exercise": "Generate x86-64 assembly for a simple expression language."
+    },
+    {
+      "date": "2027-05-19",
+      "title": "Linker and Loader",
+      "core_question": "How does dynamic linking work?",
+      "things_to_check": [
+        "How to implement lazy binding?",
+        "How to handle PLT/GOT?",
+        "How to implement .dynamic section?",
+        "How to load shared libraries?"
+      ],
+      "exercise": "Write a simple dynamic linker that resolves symbols at runtime."
+    },
+    {
+      "date": "2027-05-20",
+      "title": "Read-Eval-Print Loop",
+      "core_question": "How to implement a REPL in C?",
+      "things_to_check": [
+        "How to parse user input?",
+        "How to evaluate expressions?",
+        "How to handle variables?",
+        "How to implement history and completion?"
+      ],
+      "exercise": "Write a REPL for a simple expression language with arithmetic."
+    },
+    {
+      "date": "2027-05-21",
+      "title": "Memory Debugging",
+      "core_question": "How to implement a memory debugger?",
+      "things_to_check": [
+        "How to track allocations?",
+        "How to detect memory leaks?",
+        "How to detect buffer overflows?",
+        "How to handle backtraces?"
+      ],
+      "exercise": "Implement a simple memory tracker using malloc hooks."
+    },
+    {
+      "date": "2027-05-22",
+      "title": "Dynamic Analysis Tools",
+      "core_question": "How to build fuzzing tools?",
+      "things_to_check": [
+        "How to generate test inputs?",
+        "How to run tests?",
+        "How to detect crashes?",
+        "How to report issues?"
+      ],
+      "exercise": "Build a simple black-box fuzzer for a command-line tool."
+    },
+    {
+      "date": "2027-05-23",
+      "title": "Program Analysis",
+      "core_question": "How to analyze C code?",
+      "things_to_check": [
+        "How to use Clang AST?",
+        "How to find bugs?",
+        "How to track variables?",
+        "How to implement taint analysis?"
+      ],
+      "exercise": "Write a Clang tool that detects uninitialized variable usage."
+    },
+    {
+      "date": "2027-05-24",
+      "title": "Formal Verification",
+      "core_question": "How to prove program correctness?",
+      "things_to_check": [
+        "What are invariants?",
+        "How to use ACSL?",
+        "How to use Frama-C?",
+        "How to verify contracts?"
+      ],
+      "exercise": "Add ACSL annotations to a sorting function and verify with Frama-C."
+    },
+    {
+      "date": "2027-05-25",
+      "title": "Testing Frameworks",
+      "core_question": "How to implement a test framework?",
+      "things_to_check": [
+        "How to register tests?",
+        "How to run tests?",
+        "How to report results?",
+        "How to handle setup/teardown?"
+      ],
+      "exercise": "Write a minimal unit test framework in C."
+    },
+    {
+      "date": "2027-05-26",
+      "title": "Build Systems",
+      "core_question": "How to implement a build system?",
+      "things_to_check": [
+        "How to handle dependencies?",
+        "How to compile sources?",
+        "How to link?",
+        "How to handle incremental builds?"
+      ],
+      "exercise": "Write a simple build system that compiles and links C programs."
+    },
+    {
+      "date": "2027-05-27",
+      "title": "Version Control Integration",
+      "core_question": "How to integrate with Git?",
+      "things_to_check": [
+        "How to use libgit2?",
+        "How to clone repositories?",
+        "How to commit changes?",
+        "How to handle branches?"
+      ],
+      "exercise": "Write a program that automatically commits changes when tests pass."
+    },
+    {
+      "date": "2027-05-28",
+      "title": "Continuous Integration",
+      "core_question": "How to set up CI for C projects?",
+      "things_to_check": [
+        "How to use GitHub Actions?",
+        "How to build and test?",
+        "How to handle multiple platforms?",
+        "How to run static analysis?"
+      ],
+      "exercise": "Set up a GitHub Actions workflow that builds, tests, and analyzes a C project."
+    },
+    {
+      "date": "2027-05-29",
+      "title": "Documentation Generation",
+      "core_question": "How to generate documentation from code?",
+      "things_to_check": [
+        "How to use Doxygen?",
+        "How to format comments?",
+        "How to generate diagrams?",
+        "How to produce PDF/HTML?"
+      ],
+      "exercise": "Add Doxygen comments to a library and generate documentation."
+    },
+    {
+      "date": "2027-05-30",
+      "title": "Code Style Enforcement",
+      "core_question": "How to enforce coding standards?",
+      "things_to_check": [
+        "How to use clang-format?",
+        "How to use clang-tidy?",
+        "How to write custom rules?",
+        "How to integrate in CI?"
+      ],
+      "exercise": "Write a clang-tidy rule that enforces naming conventions."
+    },
+    {
+      "date": "2027-05-31",
+      "title": "Profiling with perf",
+      "core_question": "How to use Linux perf for profiling?",
+      "things_to_check": [
+        "How to collect samples?",
+        "How to interpret reports?",
+        "How to trace events?",
+        "How to profile with CPU counters?"
+      ],
+      "exercise": "Profile a program with perf and identify hotspots."
+    },
+    {
+      "date": "2027-06-01",
+      "title": "IO Profiling",
+      "core_question": "How to profile I/O performance?",
+      "things_to_check": [
+        "How to use blktrace?",
+        "How to measure iowait?",
+        "How to identify bottlenecks?",
+        "How to optimize I/O patterns?"
+      ],
+      "exercise": "Profile a database workload and identify disk I/O bottlenecks."
+    },
+    {
+      "date": "2027-06-02",
+      "title": "Network Performance",
+      "core_question": "How to measure network performance?",
+      "things_to_check": [
+        "How to use iperf?",
+        "How to measure latency?",
+        "How to measure throughput?",
+        "How to analyze packet loss?"
+      ],
+      "exercise": "Write a network bandwidth test that measures TCP performance."
+    },
+    {
+      "date": "2027-06-03",
+      "title": "Caching and Buffering",
+      "core_question": "How to implement effective caching?",
+      "things_to_check": [
+        "What are cache strategies?",
+        "How to implement caching?",
+        "How to handle invalidation?",
+        "How to implement expiration?"
+      ],
+      "exercise": "Implement a cache for database queries with LRU eviction."
+    },
+    {
+      "date": "2027-06-04",
+      "title": "Scalable Systems",
+      "core_question": "How to design systems that scale?",
+      "things_to_check": [
+        "What are the scalability patterns?",
+        "How to handle load?",
+        "How to partition data?",
+        "How to handle failures?"
+      ],
+      "exercise": "Design a scalable URL shortener with C implementation."
+    },
+    {
+      "date": "2027-06-05",
+      "title": "Distributed Systems",
+      "core_question": "How to implement distributed consensus?",
+      "things_to_check": [
+        "What is Paxos/Raft?",
+        "How to implement leader election?",
+        "How to handle log replication?",
+        "How to handle failures?"
+      ],
+      "exercise": "Implement a simple Raft consensus algorithm in C."
+    },
+    {
+      "date": "2027-06-06",
+      "title": "Data Replication",
+      "core_question": "How to replicate data across nodes?",
+      "things_to_check": [
+        "What are replication strategies?",
+        "How to handle consistency?",
+        "How to resolve conflicts?",
+        "How to handle network partitions?"
+      ],
+      "exercise": "Implement a master-slave replication system for key-value store."
+    },
+    {
+      "date": "2027-06-07",
+      "title": "Database Internals",
+      "core_question": "How to implement a simple database?",
+      "things_to_check": [
+        "How to handle storage?",
+        "How to implement indexing?",
+        "How to process queries?",
+        "How to handle transactions?"
+      ],
+      "exercise": "Implement a simple key-value database with indexes and transactions."
+    },
+    {
+      "date": "2027-06-08",
+      "title": "Logging and Monitoring",
+      "core_question": "How to implement effective logging?",
+      "things_to_check": [
+        "What are log levels?",
+        "How to structure logs?",
+        "How to handle rotation?",
+        "How to implement metrics?"
+      ],
+      "exercise": "Write a library that logs structured JSON and exposes metrics."
+    },
+    {
+      "date": "2027-06-09",
+      "title": "Alerting Systems",
+      "core_question": "How to implement alerting?",
+      "things_to_check": [
+        "How to define thresholds?",
+        "How to handle anomalies?",
+        "How to send alerts?",
+        "How to implement escalation?"
+      ],
+      "exercise": "Implement an alerting system that monitors metrics and sends notifications."
+    },
+    {
+      "date": "2027-06-10",
+      "title": "Data Serialization",
+      "core_question": "How to choose serialization formats?",
+      "things_to_check": [
+        "What are the tradeoffs?",
+        "How to implement custom serialization?",
+        "How to handle versioning?",
+        "How to optimize for size/speed?"
+      ],
+      "exercise": "Compare JSON, Protobuf, and MessagePack serialization in C."
+    },
+    {
+      "date": "2027-06-11",
+      "title": "Message Brokers",
+      "core_question": "How to implement a message broker?",
+      "things_to_check": [
+        "What are publish-subscribe patterns?",
+        "How to handle queues?",
+        "How to ensure delivery?",
+        "How to handle persistence?"
+      ],
+      "exercise": "Implement a simple message broker with publish-subscribe."
+    },
+    {
+      "date": "2027-06-12",
+      "title": "Stream Processing",
+      "core_question": "How to process data streams?",
+      "things_to_check": [
+        "What are stream processing patterns?",
+        "How to handle windows?",
+        "How to handle joins?",
+        "How to handle state?"
+      ],
+      "exercise": "Implement a windowed counting system for data streams."
+    },
+    {
+      "date": "2027-06-13",
+      "title": "Data Pipelines",
+      "core_question": "How to build data processing pipelines?",
+      "things_to_check": [
+        "How to handle data ingestion?",
+        "How to transform data?",
+        "How to handle errors?",
+        "How to monitor pipelines?"
+      ],
+      "exercise": "Implement a simple ETL pipeline with C programs."
+    },
+    {
+      "date": "2027-06-14",
+      "title": "Security Auditing",
+      "core_question": "How to audit code for security?",
+      "things_to_check": [
+        "What are common vulnerabilities?",
+        "How to use security tools?",
+        "How to review code?",
+        "How to write security tests?"
+      ],
+      "exercise": "Audit a C codebase and write a security report."
+    },
+    {
+      "date": "2027-06-15",
+      "title": "Vulnerability Disclosure",
+      "core_question": "How to handle found vulnerabilities?",
+      "things_to_check": [
+        "How to disclose responsibly?",
+        "How to patch vulnerabilities?",
+        "How to communicate with stakeholders?",
+        "How to prevent recurrence?"
+      ],
+      "exercise": "Write a responsible disclosure policy for a project."
+    },
+    {
+      "date": "2027-06-16",
+      "title": "Incident Response",
+      "core_question": "How to respond to security incidents?",
+      "things_to_check": [
+        "How to detect incidents?",
+        "How to investigate?",
+        "How to contain?",
+        "How to recover?"
+      ],
+      "exercise": "Create an incident response plan for a server compromise."
+    },
+    {
+      "date": "2027-06-17",
+      "title": "Disaster Recovery",
+      "core_question": "How to implement disaster recovery?",
+      "things_to_check": [
+        "What are RPO and RTO?",
+        "How to backup data?",
+        "How to restore?",
+        "How to test recovery?"
+      ],
+      "exercise": "Design and test a disaster recovery plan for a database."
+    },
+    {
+      "date": "2027-06-18",
+      "title": "Cloud Native",
+      "core_question": "How to build cloud-native applications?",
+      "things_to_check": [
+        "How to use cloud services?",
+        "How to handle scaling?",
+        "How to manage state?",
+        "How to handle deployment?"
+      ],
+      "exercise": "Containerize a C application and deploy to a cloud provider."
+    },
+    {
+      "date": "2027-06-19",
+      "title": "Infrastructure as Code",
+      "core_question": "How to manage infrastructure with code?",
+      "things_to_check": [
+        "How to use Terraform?",
+        "How to write modules?",
+        "How to handle state?",
+        "How to manage multiple environments?"
+      ],
+      "exercise": "Write Terraform scripts to deploy a C application to AWS."
+    },
+    {
+      "date": "2027-06-20",
+      "title": "Configuration Management",
+      "core_question": "How to manage configuration in C?",
+      "things_to_check": [
+        "How to parse config files?",
+        "How to handle secrets?",
+        "How to reload config?",
+        "How to validate config?"
+      ],
+      "exercise": "Write a library that loads configuration from file with environment override."
+    },
+    {
+      "date": "2027-06-21",
+      "title": "Environment Configuration",
+      "core_question": "How to handle different environments?",
+      "things_to_check": [
+        "How to manage env variables?",
+        "How to profile settings?",
+        "How to detect environment?",
+        "How to handle secrets?"
+      ],
+      "exercise": "Create a configuration system that adapts to development/staging/production."
+    },
+    {
+      "date": "2027-06-22",
+      "title": "Feature Flags",
+      "core_question": "How to implement feature flags in C?",
+      "things_to_check": [
+        "How to manage flags?",
+        "How to enable/disable features?",
+        "How to test flags?",
+        "How to handle performance?"
+      ],
+      "exercise": "Implement a feature flag system with runtime toggling."
+    },
+    {
+      "date": "2027-06-23",
+      "title": "Dark Launching",
+      "core_question": "How to safely deploy new features?",
+      "things_to_check": [
+        "What is dark launching?",
+        "How to handle traffic?",
+        "How to test in production?",
+        "How to handle rollbacks?"
+      ],
+      "exercise": "Implement a shadow deployment system for HTTP requests."
+    },
+    {
+      "date": "2027-06-24",
+      "title": "A/B Testing",
+      "core_question": "How to implement A/B tests?",
+      "things_to_check": [
+        "How to assign variants?",
+        "How to collect data?",
+        "How to analyze results?",
+        "How to handle multiple variants?"
+      ],
+      "exercise": "Implement an A/B testing framework for a web server."
+    },
+    {
+      "date": "2027-06-25",
+      "title": "Canary Releases",
+      "core_question": "How to implement canary deployments?",
+      "things_to_check": [
+        "How to route traffic?",
+        "How to monitor canaries?",
+        "How to rollback?",
+        "How to automate decisions?"
+      ],
+      "exercise": "Implement a canary deployment system with traffic routing."
+    },
+    {
+      "date": "2027-06-26",
+      "title": "Graceful Shutdown",
+      "core_question": "How to shut down servers gracefully?",
+      "things_to_check": [
+        "How to handle SIGTERM?",
+        "How to drain connections?",
+        "How to cleanup resources?",
+        "How to handle timeouts?"
+      ],
+      "exercise": "Add graceful shutdown to a server with connection draining."
+    },
+    {
+      "date": "2027-06-27",
+      "title": "Hot Restart",
+      "core_question": "How to restart without downtime?",
+      "things_to_check": [
+        "How to use exec?",
+        "How to handle listening sockets?",
+        "How to preserve state?",
+        "How to handle active connections?"
+      ],
+      "exercise": "Implement hot restart for a server using file descriptor passing."
+    },
+    {
+      "date": "2027-06-28",
+      "title": "Zero-Downtime Deployment",
+      "core_question": "How to deploy without downtime?",
+      "things_to_check": [
+        "How to use blue-green deployment?",
+        "How to handle database migrations?",
+        "How to handle state?",
+        "How to automate rollbacks?"
+      ],
+      "exercise": "Design a zero-downtime deployment system for a C application."
+    },
+    {
+      "date": "2027-06-29",
+      "title": "Capacity Planning",
+      "core_question": "How to plan for growth?",
+      "things_to_check": [
+        "How to measure capacity?",
+        "How to model growth?",
+        "How to provision resources?",
+        "How to handle spikes?"
+      ],
+      "exercise": "Create a capacity plan for a web service with projected growth."
+    },
+    {
+      "date": "2027-06-30",
+      "title": "SRE Principles",
+      "core_question": "How to apply SRE to C systems?",
+      "things_to_check": [
+        "What are SLOs/SLIs?",
+        "How to measure reliability?",
+        "How to handle errors?",
+        "How to automate operations?"
+      ],
+      "exercise": "Define SLOs for a service and implement monitoring for them."
+    },
+    {
+      "date": "2027-07-01",
+      "title": "Post-Mortems",
+      "core_question": "How to learn from failures?",
+      "things_to_check": [
+        "How to conduct post-mortems?",
+        "How to avoid blame culture?",
+        "How to find root causes?",
+        "How to implement actions?"
+      ],
+      "exercise": "Write a post-mortem template and conduct an analysis of a past incident."
+    },
+    {
+      "date": "2027-07-02",
+      "title": "Culture of Testing",
+      "core_question": "How to promote testing culture?",
+      "things_to_check": [
+        "How to write testable code?",
+        "How to motivate testing?",
+        "How to measure test coverage?",
+        "How to integrate with development?"
+      ],
+      "exercise": "Write a testing strategy document for a C project."
+    },
+    {
+      "date": "2027-07-03",
+      "title": "Documentation Best Practices",
+      "core_question": "How to write effective documentation?",
+      "things_to_check": [
+        "How to document APIs?",
+        "How to write examples?",
+        "How to handle different audiences?",
+        "How to keep docs up-to-date?"
+      ],
+      "exercise": "Write comprehensive documentation for a C library."
+    },
+    {
+      "date": "2027-07-04",
+      "title": "Code Reviews",
+      "core_question": "How to conduct effective code reviews?",
+      "things_to_check": [
+        "What to look for?",
+        "How to give feedback?",
+        "How to handle disagreements?",
+        "How to automate checks?"
+      ],
+      "exercise": "Create a code review checklist for C projects."
+    },
+    {
+      "date": "2027-07-05",
+      "title": "Refactoring Techniques",
+      "core_question": "How to refactor C code safely?",
+      "things_to_check": [
+        "What are safe refactorings?",
+        "How to use tools?",
+        "How to test after refactoring?",
+        "How to handle legacy code?"
+      ],
+      "exercise": "Refactor a legacy C module and ensure tests still pass."
+    },
+    {
+      "date": "2027-07-06",
+      "title": "Technical Debt Management",
+      "core_question": "How to manage technical debt?",
+      "things_to_check": [
+        "How to identify debt?",
+        "How to prioritize?",
+        "How to pay down debt?",
+        "How to prevent new debt?"
+      ],
+      "exercise": "Create a technical debt backlog for a C project."
+    },
+    {
+      "date": "2027-07-07",
+      "title": "Mentoring",
+      "core_question": "How to mentor other C developers?",
+      "things_to_check": [
+        "How to teach effectively?",
+        "How to give feedback?",
+        "How to guide learning?",
+        "How to foster growth?"
+      ],
+      "exercise": "Create a learning path for a junior C developer."
+    },
+    {
+      "date": "2027-07-08",
+      "title": "Open Source Contributions",
+      "core_question": "How to contribute to open source C projects?",
+      "things_to_check": [
+        "How to find projects?",
+        "How to read code?",
+        "How to submit patches?",
+        "How to communicate effectively?"
+      ],
+      "exercise": "Make a contribution to an open-source C project."
+    },
+    {
+      "date": "2027-07-09",
+      "title": "Writing Proposals",
+      "core_question": "How to write technical proposals?",
+      "things_to_check": [
+        "How to define problem?",
+        "How to propose solution?",
+        "How to estimate costs/benefits?",
+        "How to present to stakeholders?"
+      ],
+      "exercise": "Write a proposal for a major C project."
+    },
+    {
+      "date": "2027-07-10",
+      "title": "Technical Interviews",
+      "core_question": "How to prepare for C interviews?",
+      "things_to_check": [
+        "What to expect?",
+        "How to solve problems?",
+        "How to explain solutions?",
+        "How to handle stress?"
+      ],
+      "exercise": "Practice a mock interview for a C programming position."
+    },
+    {
+      "date": "2027-07-11",
+      "title": "Interviewing Others",
+      "core_question": "How to interview C candidates?",
+      "things_to_check": [
+        "How to design questions?",
+        "How to evaluate answers?",
+        "How to test practical skills?",
+        "How to avoid bias?"
+      ],
+      "exercise": "Design an interview loop for a C developer role."
+    },
+    {
+      "date": "2027-07-12",
+      "title": "Advanced Algorithms",
+      "core_question": "How to implement advanced data structures?",
+      "things_to_check": [
+        "How to implement segment trees?",
+        "How to implement Fenwick trees?",
+        "How to implement suffix arrays?",
+        "How to implement tries?"
+      ],
+      "exercise": "Implement a segment tree with range sum and update queries."
+    },
+    {
+      "date": "2027-07-13",
+      "title": "C Programming Patterns",
+      "core_question": "What are common C design patterns?",
+      "things_to_check": [
+        "How to implement RAII in C?",
+        "How to use closures?",
+        "How to implement polymorphism?",
+        "How to handle dependency injection?"
+      ],
+      "exercise": "Implement a file system interface using function pointers for polymorphism."
+    },
+    {
+      "date": "2027-07-14",
+      "title": "Memory Semantics",
+      "core_question": "How does memory work in C?",
+      "things_to_check": [
+        "What is memory alignment?",
+        "How to optimize memory layout?",
+        "How to handle memory ordering?",
+        "How to avoid undefined behavior?"
+      ],
+      "exercise": "Write a program that demonstrates memory alignment issues and fixes them."
+    },
+    {
+      "date": "2027-07-15",
+      "title": "Networking with Zero-Copy",
+      "core_question": "How to achieve zero-copy networking?",
+      "things_to_check": [
+        "How to use sendfile?",
+        "How to use splice?",
+        "How to use direct I/O?",
+        "What are the limitations?"
+      ],
+      "exercise": "Write a file server using sendfile for zero-copy transfers."
+    },
+    {
+      "date": "2027-07-16",
+      "title": "Scalable Web Servers",
+      "core_question": "How to build a high-performance web server?",
+      "things_to_check": [
+        "How to handle concurrency?",
+        "How to optimize I/O?",
+        "How to handle static files?",
+        "How to handle dynamic content?"
+      ],
+      "exercise": "Build a simple web server that can handle 10k concurrent connections."
+    },
+    {
+      "date": "2027-07-17",
+      "title": "Real-Time Systems",
+      "core_question": "How to build real-time systems in C?",
+      "things_to_check": [
+        "What are real-time constraints?",
+        "How to use real-time scheduling?",
+        "How to handle deadlines?",
+        "How to avoid priority inversions?"
+      ],
+      "exercise": "Implement a real-time task scheduler for a microcontroller."
+    },
+    {
+      "date": "2027-07-18",
+      "title": "Safety-Critical Systems",
+      "core_question": "How to write safety-critical C code?",
+      "things_to_check": [
+        "What are safety standards (MISRA)?",
+        "How to handle errors?",
+        "How to handle redundancy?",
+        "How to handle testing?"
+      ],
+      "exercise": "Review a C module against MISRA-C guidelines."
+    },
+    {
+      "date": "2027-07-19",
+      "title": "Operating System Design",
+      "core_question": "How to design an OS in C?",
+      "things_to_check": [
+        "How to handle bootstrapping?",
+        "How to implement memory management?",
+        "How to implement processes?",
+        "How to handle interrupts?"
+      ],
+      "exercise": "Write a simple OS kernel that can boot and print a message."
+    },
+    {
+      "date": "2027-07-20",
+      "title": "Virtualization",
+      "core_question": "How to implement virtualization?",
+      "things_to_check": [
+        "What is hypervisor?",
+        "How to handle CPU virtualization?",
+        "How to handle memory virtualization?",
+        "How to handle device virtualization?"
+      ],
+      "exercise": "Write a simple hypervisor that runs a guest OS."
+    },
+    {
+      "date": "2027-07-21",
+      "title": "C and Assembly Interaction",
+      "core_question": "How to mix C and assembly?",
+      "things_to_check": [
+        "How to call assembly from C?",
+        "How to call C from assembly?",
+        "How to handle calling conventions?",
+        "How to optimize critical code?"
+      ],
+      "exercise": "Write a function in assembly and call it from C."
+    },
+    {
+      "date": "2027-07-22",
+      "title": "Firmware Development",
+      "core_question": "How to write firmware in C?",
+      "things_to_check": [
+        "How to handle bare-metal programming?",
+        "How to handle peripheral registers?",
+        "How to handle interrupts?",
+        "How to handle memory constraints?"
+      ],
+      "exercise": "Write firmware for a simple device that reads a sensor."
+    },
+    {
+      "date": "2027-07-23",
+      "title": "Bootloaders",
+      "core_question": "How to write a bootloader?",
+      "things_to_check": [
+        "How to handle boot sequence?",
+        "How to load kernel?",
+        "How to handle multiple boot options?",
+        "How to handle updates?"
+      ],
+      "exercise": "Write a simple bootloader that loads a kernel from disk."
+    },
+    {
+      "date": "2027-07-24",
+      "title": "UEFI Programming",
+      "core_question": "How to write UEFI applications in C?",
+      "things_to_check": [
+        "How to use UEFI API?",
+        "How to handle protocols?",
+        "How to handle boot services?",
+        "How to handle runtime services?"
+      ],
+      "exercise": "Write a UEFI application that displays a message and shuts down."
+    },
+    {
+      "date": "2027-07-25",
+      "title": "ACPI and Power Management",
+      "core_question": "How to handle power management?",
+      "things_to_check": [
+        "How to use ACPI?",
+        "How to handle sleep/wake?",
+        "How to handle power states?",
+        "How to handle thermal management?"
+      ],
+      "exercise": "Write a utility that reads ACPI thermal zones and displays temperature."
+    },
+    {
+      "date": "2027-07-26",
+      "title": "PCI and PCIe",
+      "core_question": "How to interact with PCI devices?",
+      "things_to_check": [
+        "How to enumerate PCI devices?",
+        "How to read/write config space?",
+        "How to handle PCIe capabilities?",
+        "How to handle MSI interrupts?"
+      ],
+      "exercise": "Write a program that enumerates PCI devices and displays their information."
+    },
+    {
+      "date": "2027-07-27",
+      "title": "USB Protocol",
+      "core_question": "How to implement USB drivers?",
+      "things_to_check": [
+        "How does USB work?",
+        "How to handle descriptors?",
+        "How to handle control transfers?",
+        "How to handle endpoints?"
+      ],
+      "exercise": "Write a USB driver for a custom HID device."
+    },
+    {
+      "date": "2027-07-28",
+      "title": "Bluetooth Low Energy",
+      "core_question": "How to implement BLE applications?",
+      "things_to_check": [
+        "How does BLE work?",
+        "How to handle advertising?",
+        "How to handle GATT?",
+        "How to handle connections?"
+      ],
+      "exercise": "Write a BLE peripheral that advertises a simple GATT service."
+    },
+    {
+      "date": "2027-07-29",
+      "title": "Wireless Networks (Wi-Fi)",
+      "core_question": "How to implement Wi-Fi in embedded systems?",
+      "things_to_check": [
+        "How to use Wi-Fi modules?",
+        "How to handle network configuration?",
+        "How to handle connections?",
+        "How to implement security?"
+      ],
+      "exercise": "Write a program that connects an embedded device to a Wi-Fi network."
+    },
+    {
+      "date": "2027-07-30",
+      "title": "LoRa and LPWAN",
+      "core_question": "How to use LoRa for long-range communication?",
+      "things_to_check": [
+        "How does LoRa work?",
+        "How to use LoRaWAN?",
+        "How to handle data rates?",
+        "How to handle battery life?"
+      ],
+      "exercise": "Write a LoRaWAN application that sends sensor data to a gateway."
+    },
+    {
+      "date": "2027-07-31",
+      "title": "IoT Security",
+      "core_question": "How to secure IoT devices in C?",
+      "things_to_check": [
+        "How to handle secure boot?",
+        "How to handle encryption?",
+        "How to handle key storage?",
+        "How to handle firmware updates?"
+      ],
+      "exercise": "Implement a secure boot and update mechanism for an IoT device."
+    },
+    {
+      "date": "2027-08-01",
+      "title": "Edge Computing",
+      "core_question": "How to implement edge computing in C?",
+      "things_to_check": [
+        "How to handle local processing?",
+        "How to handle intermittent connectivity?",
+        "How to handle data aggregation?",
+        "How to handle latency?"
+      ],
+      "exercise": "Implement an edge device that processes data and sends summaries to the cloud."
+    },
+    {
+      "date": "2027-08-02",
+      "title": "Fog Computing",
+      "core_question": "How to implement fog computing?",
+      "things_to_check": [
+        "What is fog computing?",
+        "How to handle distributed processing?",
+        "How to handle data locality?",
+        "How to handle real-time constraints?"
+      ],
+      "exercise": "Implement a fog node that aggregates data from multiple edge devices."
+    },
+    {
+      "date": "2027-08-03",
+      "title": "Embedded Linux",
+      "core_question": "How to use Linux on embedded devices?",
+      "things_to_check": [
+        "How to build a Linux kernel?",
+        "How to create a root filesystem?",
+        "How to handle drivers?",
+        "How to handle systemd?"
+      ],
+      "exercise": "Build a custom Linux image for a Raspberry Pi with a C application."
+    },
+    {
+      "date": "2027-08-04",
+      "title": "Android NDK",
+      "core_question": "How to use C on Android?",
+      "things_to_check": [
+        "How to use NDK?",
+        "How to write native code?",
+        "How to use JNI?",
+        "How to handle performance?"
+      ],
+      "exercise": "Write a native C library for Android and use it from Java."
+    },
+    {
+      "date": "2027-08-05",
+      "title": "iOS C Programming",
+      "core_question": "How to use C on iOS?",
+      "things_to_check": [
+        "How to use iOS C APIs?",
+        "How to write C libraries?",
+        "How to use Xcode?",
+        "How to handle memory?"
+      ],
+      "exercise": "Write a C library and use it in an iOS app via Objective-C."
+    },
+    {
+      "date": "2027-08-06",
+      "title": "Windows C Programming",
+      "core_question": "How to use C on Windows?",
+      "things_to_check": [
+        "How to use Win32 API?",
+        "How to handle windows?",
+        "How to handle messages?",
+        "How to use Visual Studio?"
+      ],
+      "exercise": "Write a simple Win32 application in C."
+    },
+    {
+      "date": "2027-08-07",
+      "title": "macOS C Programming",
+      "core_question": "How to use C on macOS?",
+      "things_to_check": [
+        "How to use macOS APIs?",
+        "How to handle Cocoa?",
+        "How to use Xcode?",
+        "How to handle memory management?"
+      ],
+      "exercise": "Write a C program that uses macOS system APIs."
+    },
+    {
+      "date": "2027-08-08",
+      "title": "FreeBSD C Programming",
+      "core_question": "How to use C on FreeBSD?",
+      "things_to_check": [
+        "How to use FreeBSD APIs?",
+        "How to handle ports?",
+        "How to handle jails?",
+        "How to use make?"
+      ],
+      "exercise": "Write a C program that uses FreeBSD's kqueue API."
+    },
+    {
+      "date": "2027-08-09",
+      "title": "RISC-V Programming",
+      "core_question": "How to use C on RISC-V?",
+      "things_to_check": [
+        "What is RISC-V?",
+        "How to compile C to RISC-V?",
+        "How to use RISC-V features?",
+        "How to handle extensions?"
+      ],
+      "exercise": "Write a C program and compile it for RISC-V. Simulate it with QEMU."
+    },
+    {
+      "date": "2027-08-10",
+      "title": "ARM Assembly",
+      "core_question": "How to use ARM assembly in C?",
+      "things_to_check": [
+        "How to write inline assembly?",
+        "How to use ARM instructions?",
+        "How to handle thumb mode?",
+        "How to optimize?"
+      ],
+      "exercise": "Write a C program with inline ARM assembly for a critical section."
+    },
+    {
+      "date": "2027-08-11",
+      "title": "x86-64 Assembly",
+      "core_question": "How to use x86-64 assembly in C?",
+      "things_to_check": [
+        "How to write inline assembly?",
+        "How to use x86-64 instructions?",
+        "How to handle calling conventions?",
+        "How to optimize?"
+      ],
+      "exercise": "Write a C program with inline x86-64 assembly for a performance-critical function."
+    },
+    {
+      "date": "2027-08-12",
+      "title": "SIMD in Assembly",
+      "core_question": "How to use SIMD assembly instructions?",
+      "things_to_check": [
+        "How to use SSE/AVX instructions?",
+        "How to handle vectorization?",
+        "How to use intrinsics?",
+        "How to optimize?"
+      ],
+      "exercise": "Write a function in x86-64 assembly using AVX to compute dot product."
+    },
+    {
+      "date": "2027-08-13",
+      "title": "Floating-Point Assembly",
+      "core_question": "How to handle floating-point in assembly?",
+      "things_to_check": [
+        "How to use FPU?",
+        "How to use SIMD for floats?",
+        "How to handle rounding?",
+        "How to optimize?"
+      ],
+      "exercise": "Write an assembly function for fast sin/cos computation."
+    },
+    {
+      "date": "2027-08-14",
+      "title": "Hypervisor Development",
+      "core_question": "How to write a type-2 hypervisor?",
+      "things_to_check": [
+        "How to use VMX/SVM?",
+        "How to handle VM exits?",
+        "How to virtualize memory?",
+        "How to handle I/O?"
+      ],
+      "exercise": "Write a simple hypervisor for x86-64 that runs a small guest."
+    },
+    {
+      "date": "2027-08-15",
+      "title": "TrustZone and Secure World",
+      "core_question": "How to use ARM TrustZone?",
+      "things_to_check": [
+        "What is TrustZone?",
+        "How to implement secure world?",
+        "How to handle secure storage?",
+        "How to handle secure boot?"
+      ],
+      "exercise": "Write a simple TrustZone application with secure and normal world."
+    },
+    {
+      "date": "2027-08-16",
+      "title": "Hardware Security Modules",
+      "core_question": "How to use HSMs in C?",
+      "things_to_check": [
+        "What are HSMs?",
+        "How to use PKCS#11?",
+        "How to handle key storage?",
+        "How to handle cryptographic operations?"
+      ],
+      "exercise": "Write a C program that uses a PKCS#11 library to sign data."
+    },
+    {
+      "date": "2027-08-17",
+      "title": "Secure Elements",
+      "core_question": "How to use secure elements in C?",
+      "things_to_check": [
+        "How to use TEE?",
+        "How to use smart cards?",
+        "How to handle keys?",
+        "How to handle authentication?"
+      ],
+      "exercise": "Write a program that communicates with a secure element via ISO 7816."
+    },
+    {
+      "date": "2027-08-18",
+      "title": "Post-Quantum Cryptography",
+      "core_question": "How to use post-quantum crypto in C?",
+      "things_to_check": [
+        "What are post-quantum algorithms?",
+        "How to use Kyber?",
+        "How to use Dilithium?",
+        "How to handle performance?"
+      ],
+      "exercise": "Implement a key exchange using a post-quantum algorithm."
+    },
+    {
+      "date": "2027-08-19",
+      "title": "Machine Learning on Edge",
+      "core_question": "How to run ML models on edge devices?",
+      "things_to_check": [
+        "How to use TensorFlow Lite?",
+        "How to optimize models?",
+        "How to use edge TPU?",
+        "How to handle constraints?"
+      ],
+      "exercise": "Deploy a TensorFlow Lite model on an edge device in C."
+    },
+    {
+      "date": "2027-08-20",
+      "title": "TinyML",
+      "core_question": "How to run ML on microcontrollers?",
+      "things_to_check": [
+        "What is TinyML?",
+        "How to use TensorFlow Lite Micro?",
+        "How to optimize for microcontrollers?",
+        "How to handle memory limits?"
+      ],
+      "exercise": "Train a small model and deploy it on an ARM Cortex-M with TF Lite Micro."
+    },
+    {
+      "date": "2027-08-21",
+      "title": "Embedded Databases",
+      "core_question": "How to use embedded databases in C?",
+      "things_to_check": [
+        "How to use SQLite?",
+        "How to use LMDB?",
+        "How to handle transactions?",
+        "How to optimize queries?"
+      ],
+      "exercise": "Implement a database-backed configuration system using SQLite."
+    },
+    {
+      "date": "2027-08-22",
+      "title": "Time Series Databases",
+      "core_question": "How to store time-series data in C?",
+      "things_to_check": [
+        "What are time-series databases?",
+        "How to implement time-series storage?",
+        "How to handle compression?",
+        "How to handle aggregation?"
+      ],
+      "exercise": "Implement a simple time-series database with downsampling."
+    },
+    {
+      "date": "2027-08-23",
+      "title": "Message Queues",
+      "core_question": "How to implement message queues in C?",
+      "things_to_check": [
+        "What are message queues?",
+        "How to handle persistence?",
+        "How to handle ordering?",
+        "How to handle delivery?"
+      ],
+      "exercise": "Implement a persistent message queue with disk storage."
+    },
+    {
+      "date": "2027-08-24",
+      "title": "Event Sourcing",
+      "core_question": "How to implement event sourcing in C?",
+      "things_to_check": [
+        "What is event sourcing?",
+        "How to handle events?",
+        "How to handle projections?",
+        "How to handle snapshots?"
+      ],
+      "exercise": "Implement a simple event-sourced bank account system."
+    },
+    {
+      "date": "2027-08-25",
+      "title": "CQRS",
+      "core_question": "How to implement CQRS in C?",
+      "things_to_check": [
+        "What is CQRS?",
+        "How to separate reads/writes?",
+        "How to handle eventual consistency?",
+        "How to handle query models?"
+      ],
+      "exercise": "Implement a simple CQRS system for an order management system."
+    },
+    {
+      "date": "2027-08-26",
+      "title": "Command Pattern",
+      "core_question": "How to implement command pattern in C?",
+      "things_to_check": [
+        "What is command pattern?",
+        "How to implement undo?",
+        "How to handle macros?",
+        "How to handle transactions?"
+      ],
+      "exercise": "Implement an undo/redo system for a drawing application."
+    },
+    {
+      "date": "2027-08-27",
+      "title": "Visitor Pattern in C",
+      "core_question": "How to implement visitor pattern in C?",
+      "things_to_check": [
+        "What is visitor pattern?",
+        "How to handle double dispatch?",
+        "How to implement operations?",
+        "How to extend easily?"
+      ],
+      "exercise": "Implement an AST with visitor pattern for code generation."
+    },
+    {
+      "date": "2027-08-28",
+      "title": "Builder Pattern",
+      "core_question": "How to implement builder pattern in C?",
+      "things_to_check": [
+        "What is builder pattern?",
+        "How to handle complex construction?",
+        "How to handle validation?",
+        "How to handle fluent interfaces?"
+      ],
+      "exercise": "Implement a builder for constructing SQL queries."
+    },
+    {
+      "date": "2027-08-29",
+      "title": "Factory Pattern",
+      "core_question": "How to implement factory pattern in C?",
+      "things_to_check": [
+        "What is factory pattern?",
+        "How to handle object creation?",
+        "How to handle registration?",
+        "How to handle configuration?"
+      ],
+      "exercise": "Implement a factory that creates different types of network connections."
+    },
+    {
+      "date": "2027-08-30",
+      "title": "Singleton Pattern in C",
+      "core_question": "How to implement singleton in C?",
+      "things_to_check": [
+        "What is singleton?",
+        "How to handle thread-safety?",
+        "How to handle initialization?",
+        "How to handle destruction?"
+      ],
+      "exercise": "Implement a thread-safe singleton for a configuration manager."
+    },
+    {
+      "date": "2027-08-31",
+      "title": "Prototype Pattern",
+      "core_question": "How to implement prototype pattern in C?",
+      "things_to_check": [
+        "What is prototype pattern?",
+        "How to implement cloning?",
+        "How to handle deep copies?",
+        "How to handle complex types?"
+      ],
+      "exercise": "Implement a prototype for a complex data structure with cloning."
+    },
+    {
+      "date": "2026-09-01",
+      "title": "Memory Layout of a C Program",
+      "core_question": "What lives in text, data, bss, heap, and stack?",
+      "things_to_check": [
+        "Where are global variables stored?",
+        "What happens to uninitialized static variables?",
+        "How does stack frame layout work?",
+        "How to inspect memory segments at runtime?"
+      ],
+      "exercise": "Write a program that prints the addresses of a local variable, a global variable, a static variable, and a dynamically allocated pointer. Map these to their segments."
+    }
+  ]
+}
