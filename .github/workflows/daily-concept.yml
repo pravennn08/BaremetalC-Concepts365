@@ -30,7 +30,7 @@ jobs:
           python-version: "3.13"
 
       - name: Publish today's concept
-        run: python daily_concept.py
+        run: python main.py
 
       - name: Commit and push
         shell: bash
