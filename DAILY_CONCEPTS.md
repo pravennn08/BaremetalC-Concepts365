@@ -19,4 +19,23 @@ One backend-engineering study prompt is published automatically each day. My not
 
 **My notes:**
 
+-
+
+<!-- daily-concept-date: 2026-09-02 -->
+<!-- daily-concept-index: 2 -->
+## 2026-09-02 — Idempotency
+
+**Core question:** Can this operation be safely repeated?
+
+**Things to check:**
+
+- What happens when a request is retried?
+- Where should the idempotency key be stored?
+- How long should the result be retained?
+- Can concurrent duplicate requests race?
+
+**Exercise:** Design an idempotent POST /payments endpoint with in-memory key storage and proper mutex locking in C.
+
+**My notes:**
+
 - 
