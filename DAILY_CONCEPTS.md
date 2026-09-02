@@ -38,4 +38,23 @@ One backend-engineering study prompt is published automatically each day. My not
 
 **My notes:**
 
+-
+
+<!-- daily-concept-date: 2026-09-03 -->
+<!-- daily-concept-index: 3 -->
+## 2026-09-03 — Pointer Arithmetic and Array Decay
+
+**Core question:** How do arrays differ from pointers in practice?
+
+**Things to check:**
+
+- When does an array decay to a pointer?
+- What is sizeof(array) vs sizeof(pointer)?
+- How does pointer arithmetic handle different types?
+- What are the pitfalls of multi-dimensional arrays?
+
+**Exercise:** Implement a function that sums a 2D matrix using both array indexing and pointer arithmetic. Compare assembly output.
+
+**My notes:**
+
 - 
