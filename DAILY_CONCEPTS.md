@@ -57,4 +57,23 @@ One backend-engineering study prompt is published automatically each day. My not
 
 **My notes:**
 
+-
+
+<!-- daily-concept-date: 2026-09-04 -->
+<!-- daily-concept-index: 4 -->
+## 2026-09-04 — The Volatile Keyword
+
+**Core question:** When should variables be marked volatile?
+
+**Things to check:**
+
+- How does volatile prevent compiler optimizations?
+- When is volatile needed for memory-mapped I/O?
+- Does volatile make variables atomic?
+- Common misconceptions about volatile
+
+**Exercise:** Write a busy-wait loop that polls a hardware register (simulated with a pointer). Show the difference with and without volatile using compiler explorer.
+
+**My notes:**
+
 - 
