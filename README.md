@@ -169,7 +169,7 @@ jobs:
 
 The action references follow the official [checkout](https://github.com/actions/checkout) and [setup-python](https://github.com/actions/setup-python) documentation. The concurrency group prevents overlapping runs of this workflow; it does not coordinate local edits or other workflows.
 
-The cron expression requests **09:17 every day in `Asia/Shanghai` (UTC+8)**. Keep the YAML `timezone` and Python's `TIMEZONE = ZoneInfo("Asia/Shanghai")` aligned if you change the timezone. GitHub supports the timezone field and uses UTC when it is omitted. See [scheduled workflow documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+The cron expression requests **05:00 every day in `Asia/Shanghai` (UTC+8)**. Keep the YAML `timezone` and Python's `TIMEZONE = ZoneInfo("Asia/Shanghai")` aligned if you change the timezone. GitHub supports the timezone field and uses UTC when it is omitted. See [scheduled workflow documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
 > [!IMPORTANT]
 > Add the Python script, JSON curriculum, and workflow to the repository's **default branch**—`main` if that is your default—using its normal commit or pull-request process. Scheduled workflows run only from the default branch. Scheduling is best-effort: runs can be delayed or dropped, and public-repository schedules can be disabled after 60 days without repository activity. See [GitHub's scheduling limitations](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
