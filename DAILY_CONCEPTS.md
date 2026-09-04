@@ -76,4 +76,23 @@ One backend-engineering study prompt is published automatically each day. My not
 
 **My notes:**
 
+-
+
+<!-- daily-concept-date: 2026-09-05 -->
+<!-- daily-concept-index: 5 -->
+## 2026-09-05 — Bit Manipulation and Bitfields
+
+**Core question:** How to pack and unpack data efficiently?
+
+**Things to check:**
+
+- What are the bitwise operators and their pitfalls?
+- When to use bitfields vs manual bit manipulation?
+- How does endianness affect bit packing?
+- What are the portability issues with bitfields?
+
+**Exercise:** Implement a protocol header parser that extracts fields from a 32-bit word using both bitfields and shift/mask operations. Compare the generated assembly.
+
+**My notes:**
+
 - 
