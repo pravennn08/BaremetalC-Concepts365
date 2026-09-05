@@ -95,4 +95,23 @@ One backend-engineering study prompt is published automatically each day. My not
 
 **My notes:**
 
+-
+
+<!-- daily-concept-date: 2026-09-06 -->
+<!-- daily-concept-index: 6 -->
+## 2026-09-06 — The Restrict Keyword
+
+**Core question:** How does restrict enable compiler optimization?
+
+**Things to check:**
+
+- What aliasing assumptions does restrict make?
+- When is it safe to use restrict?
+- How does restrict interact with pointers to pointers?
+- What's the performance impact in practice?
+
+**Exercise:** Implement a vector addition function with and without restrict. Compare performance for large arrays.
+
+**My notes:**
+
 - 
